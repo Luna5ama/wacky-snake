@@ -102,6 +102,7 @@
     <Link>
       <EntryPointSymbol>
       </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
