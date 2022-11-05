@@ -1,4 +1,7 @@
 #include <iostream>
+#include<fstream>
+#include<sstream>
+#include <string>
 #include "GLObjects.hpp"
 
 using namespace OpenGL;
@@ -352,7 +355,12 @@ void Framebuffer::destroyAll() {
     depthAttachment = NULL;
 }
 
-GLint createShader(const std::string& codeSrc, GLenum shaderType) {
+GLint createShader(const std::string path, GLenum shaderType) {
+    std::ifstream t(path);
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+	
+	std::string codeSrc = buffer.str();	
     const GLchar* codeSrcCStr = codeSrc.c_str();
 
     GLint id = glCreateShader(shaderType);
@@ -372,7 +380,7 @@ GLint createShader(const std::string& codeSrc, GLenum shaderType) {
     return id;
 }
 
-OpenGL::ShaderProgram::ShaderProgram(const std::string& vertex, const std::string& fragment) {
+OpenGL::ShaderProgram::ShaderProgram(const std::string vertex, const std::string fragment) {
     this->id = glCreateProgram();
     int vert = createShader(vertex, GL_VERTEX_SHADER);
     int frag = createShader(fragment, GL_FRAGMENT_SHADER);

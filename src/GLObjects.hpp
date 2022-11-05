@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <string>
 
 namespace OpenGL {
     class IGLObject {
@@ -181,9 +182,9 @@ namespace OpenGL {
         void destroyAll();
     };
 
-    class ShaderProgram final : public IGLBinding {
+    class ShaderProgram : public IGLBinding {
     public:
-        ShaderProgram(const std::string& vertex, const std::string& fragment);
+        ShaderProgram(const std::string vertex, const std::string fragment);
         ~ShaderProgram();
 
         void destroy() const override;
