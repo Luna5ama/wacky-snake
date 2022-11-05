@@ -129,7 +129,14 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GLObjects.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\RenderEngine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GameLogics.h" />
+    <ClInclude Include="src\GLObjects.hpp" />
+    <ClInclude Include="src\RenderEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
