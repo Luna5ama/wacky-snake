@@ -1,7 +1,8 @@
 #include <iostream>
-#include <GL/glew.h>
+#include <gl/glew.h>
+#include <string>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "RenderEngine.h"
 
 // Debug message handler
 void GLAPIENTRY messageCallback(GLenum source,
@@ -47,6 +48,7 @@ int main() {
     glEnable(GL_CULL_FACE);
 
     // Setup here
+	SkyboxRenderer skyboxRenderer;
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -68,6 +70,7 @@ int main() {
         glViewport(0, 0, windowSize.x, windowSize.y);
 
         // Render goes here
+		skyboxRenderer.render();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
