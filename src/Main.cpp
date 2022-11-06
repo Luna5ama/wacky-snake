@@ -105,7 +105,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 int main() {
-    std::string title = "3D Snake";
+    std::string title = "Wacky Snake";
 
     glfwInit();
 
