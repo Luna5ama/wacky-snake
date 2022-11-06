@@ -9,11 +9,11 @@
 using namespace glm;
 
 template <size_t N> [[nodiscard]]
-constexpr std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
+std::array<vec3, N / 3> createNormals(const std::array<vec3, N>& mesh) {
 
-	std::array<vec3, N> out;
+	std::array<vec3, N / 3> out{};
 
-	for (int i = 0; i < N; ++i) {
+	for (int i = 0; i < N / 3; ++i) {
 		vec3 A = mesh[i * 3];
 		vec3 B = mesh[i * 3 + 1];
 		vec3 C = mesh[i * 3 + 2];
@@ -147,7 +147,7 @@ constexpr void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos,
 		verts[7], verts[2], verts[11],
 	};
 
-	constexpr auto normals = createNormals<20>(isocahedronMesh);
+	constexpr auto normals = createNormals(isocahedronMesh);
 
 
 	for (int i = 0; i < 20; i++) {
