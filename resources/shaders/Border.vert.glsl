@@ -20,6 +20,7 @@ void main() {
 	gl_Position = projection * renderPosition;
     rawPos = pos;
     vec3 temp = pos / 256.0 + 0.5;
-    color = vec4(1.0 - temp.r, temp.g, 0.5 * temp.b + 0.5, 0.4 * smoothstep(2.0, 0.0, length(renderPosition)));
-	fragCoord = gl_Position.xy / gl_Position.w;
+    color = vec4(1.0 - temp.z, (1.0 - temp.y) * temp.z, temp.x, 0.5 * smoothstep(2.0, 0.0, length(renderPosition)));
+	color.rgb = mix(color.rgb, vec3(1.0), temp.y);
+    fragCoord = gl_Position.xy / gl_Position.w;
 }

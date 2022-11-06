@@ -18,8 +18,8 @@ void Camera::updateView(glm::vec2 mousePosDelta) {
 	this->rotation += mousePosDelta * mouseSpeed;
 	this->rotation.y = std::clamp(this->rotation.y, -90.0f, 90.0f);
 	this->matrix.modelView = glm::identity<glm::mat4>();
-	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
+	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {	
