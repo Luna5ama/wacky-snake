@@ -64,7 +64,7 @@ public:
 	constexpr float dist(Object obj, int offset = 0) const {
 
 		// really big number
-		float current = 9999999999999999999.0f;
+		float current = std::numeric_limits<float>::max();
 
 		// https://iquilezles.org/articles/distfunctions/
 		auto dist = [&](glm::vec3 s1, glm::vec3 s2) {

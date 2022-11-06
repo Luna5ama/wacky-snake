@@ -18,6 +18,6 @@ out vec4 color;
 
 void main() {
     gl_Position = projection * modelView * vec4(vertPos, 1.0);
-	normal = vertNormal;
+	normal = normalize(transpose(mat3(inverseModelView)) * vertNormal);
 	color = vertColor;
 }
