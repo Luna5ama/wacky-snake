@@ -7,19 +7,24 @@
 #include "Main.h"
 #include <iostream>
 
-Camera::Camera() : matrix(), rotation(), fov(60.0f) {}
+Camera::Camera() : matrix(), rotation(135.0f, 45.0f), fov(60.0f) {}
 
 void Camera::updateProjection(GameWindow& gameWindow) {
 	this->matrix.projection = glm::perspective(glm::radians(this->fov), (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 1024.0f);
 }
 	
-void Camera::updateView(glm::vec2 mousePosDelta) {
+void Camera::updateModelView(Game& game, glm::vec2 mousePosDelta) {
 	float mouseSpeed = 0.1f;
 	this->rotation += mousePosDelta * mouseSpeed;
 	this->rotation.y = std::clamp(this->rotation.y, -90.0f, 90.0f);
 	this->matrix.modelView = glm::identity<glm::mat4>();
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
+	this->matrix.modelView = glm::translate(this->matrix.modelView, -game.player.segments[0]); 
+	glm::vec2 sin = glm::sin(glm::radians(this->rotation));
+	glm::vec2 cos = glm::cos(glm::radians(this->rotation));
+	glm::vec3 dir = glm::vec3(-sin.x * cos.y, sin.y, cos.x * cos.y);
+	this->matrix.modelView = glm::translate(this->matrix.modelView, dir * -5.0f);
 }
 
 SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {	
@@ -77,7 +82,6 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 }
 
 void SkyboxRenderer::render(GameWindow& gameWindow) {
-	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	this->borderShaderProgram.bind();
@@ -129,10 +133,6 @@ void setupMesh(RenderEngine& renderEngine, Game& game, float tickDelta) {
 				break;
 		}
 	}
-
-	fillSnakeMeshInterleaved(game.player.segments, renderEngine.buffer, Snake::radius, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-
 	renderEngine.worldObjVAO.clearAttachments();
 	renderEngine.worldObjVAO.attachVertexBuffer(
 		renderEngine.buffer.buffer,
@@ -145,6 +145,20 @@ void setupMesh(RenderEngine& renderEngine, Game& game, float tickDelta) {
 	);
 	renderEngine.worldObjVertexCount = renderEngine.buffer.size / 40;
 	renderEngine.buffer.finish();
+
+	fillSnakeMeshInterleaved(game.player.segments, renderEngine.buffer, Snake::radius, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	renderEngine.snakeVAO.clearAttachments();
+	renderEngine.snakeVAO.attachVertexBuffer(
+		renderEngine.buffer.buffer,
+		renderEngine.buffer.offset(),
+		OpenGL::VertexAttribute::Builder(40)
+		.addFloat(0, 3, GL_FLOAT, false)
+		.addFloat(1, 3, GL_FLOAT, false)
+		.addFloat(2, 4, GL_FLOAT, false)
+		.build()
+	);
+	renderEngine.snakeVertexCount = renderEngine.buffer.size / 40;
+	renderEngine.buffer.finish();
 }
 
 void RenderEngine::setup(GameWindow& gameWindow, Game& game, float tickDelta) {
@@ -153,10 +167,13 @@ void RenderEngine::setup(GameWindow& gameWindow, Game& game, float tickDelta) {
 }
 
 void RenderEngine::render(GameWindow& gameWindow, float tickDelta) {
+	glEnable(GL_DEPTH_TEST);
 	this->genericDrawShaderProgram.bind();
 	this->genericDrawShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->globalUBO, "Global");
 	this->worldObjVAO.bind();
 	glDrawArrays(GL_TRIANGLES, 0, this->worldObjVertexCount);
+	this->snakeVAO.bind();
+	glDrawArrays(GL_TRIANGLES, 0, this->snakeVertexCount);
 }
 
 PersistentMappedBuffer::PersistentMappedBuffer(GLsizeiptr size) : frame(0), size(0) {
