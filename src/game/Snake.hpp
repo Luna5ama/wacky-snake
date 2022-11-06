@@ -20,7 +20,7 @@ private:
 	// flag preventing multiple turn segments being created per frame.
 	bool turned = false;
 	double timeSinceTurn = 100000.0;
-	glm::vec2 queuedRotation = glm::vec2(0.0f);
+	glm::vec2 queuedRotation = glm::vec2(-100.0f);
 
 protected:
 	glm::vec2 rotation;
@@ -157,9 +157,9 @@ public:
 	// returns a LoseCode other than None on game end
 	[[nodiscard]] 
 	LoseCode tick(float dt, World& world) {
-		if (queuedRotation != glm::vec2(0.0) && timeSinceTurn * speed > radius) {
+		if (queuedRotation != glm::vec2(-100.0) && timeSinceTurn * speed > radius) {
 			setRotation(queuedRotation);
-			queuedRotation = glm::vec2(0.0);
+			queuedRotation = glm::vec2(-100.0);
 		}
 		timeSinceTurn += dt;
 
