@@ -108,10 +108,11 @@ void setupUBO(RenderEngine& renderEngine, GameWindow& gameWindow, float tickDelt
 
 	glm::mat4 inverseProjectionMatrix = glm::inverse(renderEngine.camera.matrix.projection);
 	glm::mat4 inverseModelViewMatrix = glm::inverse(renderEngine.camera.matrix.modelView);
-	memcpy(mem + i, &inverseProjectionMatrix, sizeof(glm::mat4));
-	i += sizeof(glm::mat4);
-	memcpy(mem + i, &inverseModelViewMatrix, sizeof(glm::mat4));
-	i += sizeof(glm::mat4);
+	memcpy(mem + i, &inverseProjectionMatrix, 64);
+	i += 64;
+	memcpy(mem + i, &inverseModelViewMatrix, 64);
+	i += 64;
+	
 	glm::f32vec2 windowSize((float) gameWindow.windowSize.x, (float) gameWindow.windowSize.y);
 	memcpy(mem + i, &windowSize, sizeof(glm::vec2));
 	i += sizeof(glm::vec2);
