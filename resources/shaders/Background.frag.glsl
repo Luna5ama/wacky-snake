@@ -1,7 +1,16 @@
 #version 460
 
+layout(std140) uniform Global {
+    mat4 projection;
+    mat4 modelView;
+    mat4 inverseProjection;
+    mat4 inverseModelView;
+    vec2 screenResolution;
+    float tickDelta;
+};
+
+
 uniform vec2 mouse;
-uniform vec2 resolution;
 
 in vec2 fragCoord;
 
@@ -42,7 +51,7 @@ vec3 calcDir(vec2 rotation) {
 void main() {
     fragColor = vec4(0.0, 0.0, 0.0, 1.0);
     
-    float aspect = resolution.x / resolution.y;
+    float aspect = screenResolution.x / screenResolution.y;
     
     vec2 rotation = vec2(mouse.x * 2.0 - 1.0, mouse.y - 0.5) * PI;
     vec3 dir = calcDir(rotation);
@@ -50,7 +59,7 @@ void main() {
     relativeRotation = clamp(relativeRotation, vec2(-PI, -0.5 * PI), vec2(PI, 0.5 * PI));
     vec3 relativeDir = calcDir(relativeRotation);
     
-    vec2 res = 1.0 / resolution;
+    vec2 res = 1.0 / screenResolution;
     
     stars();
     
@@ -59,4 +68,6 @@ void main() {
     
     float sun = max(distance(relativeDir, SUN_DIR), 0.0);
     fragColor.rgb += 0.4 / sun * SUN_COLOR;
+
+    fragColor = vec4(1.0);
 }

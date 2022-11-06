@@ -2,6 +2,8 @@
 
 #include "GLObjects.hpp"
 
+class RenderEngine;
+
 struct ProjViewModelMatrix {
 	glm::mat4 projection;
 	glm::mat4 modelView;
@@ -13,18 +15,21 @@ public:
 	glm::vec2 rotation;
 	float fov;
 
+	Camera();
+
 	void updateProjection(glm::vec2 windowSize);
 	void updateView(glm::vec2 mousePosDelta);
 };
 
 struct SkyboxShaderProgram : public OpenGL::ShaderProgram {
-	GLuint resolutionUniform;
 	GLuint mouseUniform;
 
 	SkyboxShaderProgram();
 };
 
 struct SkyboxRenderer {
+	RenderEngine& renderEngine;
+	
 	SkyboxShaderProgram skyboxShaderProgram;
 	OpenGL::VertexArrayObject skyboxVAO;
 	OpenGL::BufferObject::Immutable skyboxVBO;
@@ -33,16 +38,18 @@ struct SkyboxRenderer {
 	OpenGL::VertexArrayObject borderVAO;
 	OpenGL::BufferObject::Immutable borderVBO;
 
-	SkyboxRenderer();
+	SkyboxRenderer(RenderEngine& renderEngine);
 
-    void render() const;
+    void render();
 };
 
 class RenderEngine {
-private:
-	SkyboxShaderProgram skyboxShaderProgram;
 public:
+	OpenGL::BufferObject::Immutable globalUBO;
 	Camera camera;
+	SkyboxRenderer skyboxRenderer;
 	
-	void renderSkybox();
+	RenderEngine();
+	
+	void setupGlobalUBO(glm::vec2 windowSize, float tickDelta);
 };
