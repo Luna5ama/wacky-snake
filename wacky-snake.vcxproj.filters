@@ -58,7 +58,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\shaders\GenericDraw.vert.glsl" />
     <None Include="resources\shaders\Border.frag.glsl" />
     <None Include="resources\shaders\Border.vert.glsl" />
+    <None Include="resources\shaders\GenericDraw.frag.glsl" />
   </ItemGroup>
 </Project>
