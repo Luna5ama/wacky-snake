@@ -56,10 +56,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             break;
 
         case GLFW_KEY_SPACE:
-            game.player.setRotation(cameraRotation + glm::vec2(0.0f, 90.0f));
+            game.player.setRotation(glm::vec2(0.0f, 90.0f));
             break;
         case GLFW_KEY_LEFT_SHIFT:
-            game.player.setRotation(cameraRotation + glm::vec2(0.0f, -90.0f));
+            game.player.setRotation(glm::vec2(0.0f, -90.0f));
             break;
             
         case GLFW_KEY_ESCAPE:
