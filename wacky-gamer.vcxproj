@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="src\GameLogics.h" />
     <ClInclude Include="src\GLObjects.hpp" />
+    <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\RenderEngine.h" />
   </ItemGroup>
   <ItemGroup>

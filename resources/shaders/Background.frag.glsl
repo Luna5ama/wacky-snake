@@ -1,5 +1,6 @@
 #version 460
 
+
 layout(std140) uniform Global {
     mat4 projection;
     mat4 modelView;
@@ -18,7 +19,7 @@ out vec4 fragColor;
 
 const float PI = 3.14159;
 
-const int STAR_COUNT = 100;
+const int STAR_COUNT = 30;
 const vec3 STAR_COLOR = vec3(1.0);
 
 const vec3 SUN_DIR = vec3(0.0, 0.0, 1.0);
@@ -30,7 +31,7 @@ float rand(vec2 co){
 }
 
 void point(vec2 pos, float size) {
-    float d = distance(fragCoord, pos);
+    float d = distance(fragCoord * screenResolution, pos * screenResolution);
     fragColor.rgb += smoothstep(size, 0.0, d) * STAR_COLOR;
 }
 
@@ -59,8 +60,6 @@ void main() {
     relativeRotation = clamp(relativeRotation, vec2(-PI, -0.5 * PI), vec2(PI, 0.5 * PI));
     vec3 relativeDir = calcDir(relativeRotation);
     
-    vec2 res = 1.0 / screenResolution;
-    
     stars();
     
     float flare = dot(dir, SUN_DIR);
@@ -68,6 +67,4 @@ void main() {
     
     float sun = max(distance(relativeDir, SUN_DIR), 0.0);
     fragColor.rgb += 0.4 / sun * SUN_COLOR;
-
-    fragColor = vec4(1.0);
 }

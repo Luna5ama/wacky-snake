@@ -1,20 +1,25 @@
 #include "RenderEngine.h"
+#include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include "Main.h"
 
-Camera::Camera() : fov(90.0f) {
+#include <iostream>
 
+Camera::Camera() : matrix(), rotation(), fov(90.0f) {}
+
+void Camera::updateProjection(GameWindow& gameWindow) {
+	this->matrix.projection = glm::perspective(this->fov, (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 1024.0f);
 }
-
-void Camera::updateProjection(glm::vec2 windowSize) {
-	this->matrix.projection = glm::perspective(this->fov, windowSize.x / windowSize.y, 0.01f, 1024.0f);
-}
-
+	
 void Camera::updateView(glm::vec2 mousePosDelta) {
 	float mouseSpeed = 0.1f;
 	this->rotation += mousePosDelta * mouseSpeed;
 	this->rotation.y = std::clamp(this->rotation.y, -90.0f, 90.0f);
+	this->matrix.modelView = glm::identity<glm::mat4>();
+	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
+	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 SkyboxShaderProgram::SkyboxShaderProgram() : OpenGL::ShaderProgram("resources/shaders/Background.vert.glsl", "resources/shaders/Background.frag.glsl") {
@@ -22,7 +27,7 @@ SkyboxShaderProgram::SkyboxShaderProgram() : OpenGL::ShaderProgram("resources/sh
 }
 
 SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {
-	glm::vec2 shaderDrawVertices[] = {
+	glm::vec2 shaderVertices[] = {
 		{ -1.0f, -1.0f },
 		{ 1.0f, -1.0f },
 		{ -1.0f, 1.0f },
@@ -30,7 +35,7 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 		{ -1.0f, 1.0f },
 		{ 1.0f, -1.0f }
 	};
-	this->skyboxVBO.allocate(&shaderDrawVertices, sizeof(shaderDrawVertices), 0);
+	this->skyboxVBO.allocate(&shaderVertices, sizeof(shaderVertices), 0);
 	this->skyboxVAO.attachVertexBuffer(
 		this->skyboxVBO,
 		OpenGL::VertexAttribute::Builder(8)
@@ -38,7 +43,7 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 		.build()
 	);
 	
-	glm::vec3 borderDrawVertices[] = {
+	glm::vec3 borderVertices[] = {
 		// Down
 		{ 128.0f, -128.0f, -128.0f },
 		{ -128.0f, -128.0f, -128.0f },
@@ -63,7 +68,7 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 		// East
 		{ 128.0f, -128.0f, -128.0f },
 		{ 128.0f, -128.0f, 128.0f },
-		{ 128.0f, 128.0f, -128.0f },
+		{128.0f, 128.0f, -128.0f },
 		{ 128.0f, 128.0f, 128.0f },
 		{ 128.0f, -128.0f, 128.0f },
 		{ 128.0f, 128.0f, -128.0f },
@@ -82,33 +87,45 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 		{ 128.0f, -128.0f, 128.0f },
 		{ -128.0f, 128.0f, 128.0f }
 	};
-
-	
+	this->borderVBO.allocate(&borderVertices, sizeof(borderVertices), 0);
+	this->borderVAO.attachVertexBuffer(
+		this->borderVBO,
+		OpenGL::VertexAttribute::Builder(12)
+		.addFloat(0, 3, GL_FLOAT, false)
+		.build()
+	);
 }
 
-void SkyboxRenderer::render() {
+void SkyboxRenderer::render(GameWindow& gameWindow) {
 	this->skyboxShaderProgram.bind();
 	this->skyboxShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->renderEngine.globalUBO, "Global");
+	glm::f64vec2 mousePos;
+	glfwGetCursorPos(gameWindow.window, &mousePos.x, &mousePos.y);
+	glm::vec2 normMousePos(((GLfloat)mousePos.x) / gameWindow.windowSize.x,
+		1.0f - ((GLfloat)mousePos.y) / gameWindow.windowSize.y);
+	glUniform2f(
+		this->skyboxShaderProgram.mouseUniform,
+		normMousePos.x, normMousePos.y
+	);
 	this->skyboxVAO.bind();
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//this->borderShaderProgram.bind();
-	//this->borderVAO.bind();
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	this->borderShaderProgram.bind();
+	this->borderVAO.bind();
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 RenderEngine::RenderEngine() : skyboxRenderer(*this) {
 	globalUBO.allocate(268, GL_DYNAMIC_STORAGE_BIT);
 }
 
-void RenderEngine::setupGlobalUBO(glm::vec2 windowSize, float tickDelta) {
-	char* mem = new char[268];
+void RenderEngine::setup(GameWindow& gameWindow, float tickDelta) {
+	char mem[268];
 	size_t i = 0;
-	memccpy(mem + i, &this->camera.matrix, i, sizeof(ProjViewModelMatrix));
+	memcpy(mem + i, &this->camera.matrix, sizeof(ProjViewModelMatrix));
 	i += sizeof(ProjViewModelMatrix);
 	
 	glm::mat4 inverseProjectionMatrix = glm::inverse(this->camera.matrix.projection);
@@ -117,6 +134,7 @@ void RenderEngine::setupGlobalUBO(glm::vec2 windowSize, float tickDelta) {
 	i += sizeof(glm::mat4);
 	memcpy(mem + i, &inverseModelViewMatrix, sizeof(glm::mat4));
 	i += sizeof(glm::mat4);
+	glm::f32vec2 windowSize((float) gameWindow.windowSize.x, (float) gameWindow.windowSize.y);
 	memcpy(mem + i, &windowSize, sizeof(glm::vec2));
 	i += sizeof(glm::vec2);
 
@@ -124,6 +142,4 @@ void RenderEngine::setupGlobalUBO(glm::vec2 windowSize, float tickDelta) {
 
 	this->globalUBO.invalidate();
 	glNamedBufferSubData(this->globalUBO.id, 0, 268, mem);
-	
-	delete[] mem;
 }

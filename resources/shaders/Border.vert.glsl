@@ -9,12 +9,12 @@ layout(std140) uniform Global {
     float tickDelta;
 };
 
-in vec3 pos;
+layout(location = 0) in vec3 pos;
 
-out float alpha;
+out vec4 color;
 
 void main() {
     vec4 renderPosition = modelView * vec4(pos, 1.0);
 	gl_Position = projection * renderPosition;
-	alpha = 0.2 + 0.4 * smoothstep(2.0, 0.0, length(renderPosition));
+    color = vec4(pos / 256.0 + 0.5, 0.2 + 0.4 * smoothstep(2.0, 0.0, length(renderPosition)));
 }
