@@ -1,10 +1,10 @@
-#include "RenderEngine.h"
+#include "RenderEngine.hpp"
 #include "Mesh.hpp"
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
-#include "Main.h"
+#include "Main.hpp"
 #include <iostream>
 
 Camera::Camera() : matrix(), rotation(160.0f, 30.0f), fov(60.0f) {}

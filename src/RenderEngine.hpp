@@ -1,9 +1,9 @@
 #pragma once
 
-#include "game/Game.hpp"
+#include "Game.hpp"
 #include <glm/glm.hpp>
 #include "GLObjects.hpp"
-#include "Main.h"
+#include "Main.hpp"
 
 class RenderEngine;
 

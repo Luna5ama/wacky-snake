@@ -3,8 +3,7 @@
 #include <vector>
 #include <numbers>
 #include <glm/glm.hpp>
-
-#include "../MathUtils.h"
+#include "MathUtils.hpp"
 #include "Object.hpp"
 #include "World.hpp"
 
@@ -34,10 +33,7 @@ public:
 	static constexpr float speed = 2.0f; // speed in m/s
 	float shrinkage = glm::pow(0.5f, 1.0f / 30.0f);
 
-	Snake() :
-		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -20.0) }),
-		rotation(),
-		length(20.0f) {}
+	Snake();
 
 	void setRotation(glm::vec2 rotation) {
 		rotation.x = normalizeAngle(rotation.x);

@@ -1,4 +1,4 @@
-#include "MathUtils.h"
+#include "MathUtils.hpp"
 #include <math.h>
 
 float normalizeAngle(float x) {

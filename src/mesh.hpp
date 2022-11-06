@@ -2,21 +2,18 @@
 
 #include <vector>
 #include <array>
-
 #include <glm/glm.hpp>
-#include "RenderEngine.h"
-
-using namespace glm;
+#include "RenderEngine.hpp"
 
 template <size_t N> [[nodiscard]]
-std::array<vec3, N / 3> createNormals(const std::array<vec3, N>& mesh) {
+std::array<glm::vec3, N / 3> createNormals(const std::array<glm::vec3, N>& mesh) {
 
-	std::array<vec3, N / 3> out{};
+	std::array<glm::vec3, N / 3> out{};
 
 	for (int i = 0; i < N / 3; ++i) {
-		vec3 a = mesh[i * 3];
-		vec3 b = mesh[i * 3 + 1];
-		vec3 c = mesh[i * 3 + 2];
+		glm::vec3 a = mesh[i * 3];
+		glm::vec3 b = mesh[i * 3 + 1];
+		glm::vec3 c = mesh[i * 3 + 2];
 
 		out[i] = glm::normalize(glm::cross(b - a, c - a));
 	}
@@ -25,15 +22,15 @@ std::array<vec3, N / 3> createNormals(const std::array<vec3, N>& mesh) {
 }
 
 template <class T> [[nodiscard]]
-std::vector<vec3> createNormals(const T& mesh) {
+std::vector<glm::vec3> createNormals(const T& mesh) {
 
-	std::vector<vec3> out;
+	std::vector<glm::vec3> out;
 	out.reserve(mesh.size() / 3);
 
 	for (int i = 0; i < mesh.size() / 3; ++i) {
-		vec3 A = mesh[i * 3];
-		vec3 B = mesh[i * 3 + 1];
-		vec3 C = mesh[i * 3 + 2];
+		glm::vec3 A = mesh[i * 3];
+		glm::vec3 B = mesh[i * 3 + 1];
+		glm::vec3 C = mesh[i * 3 + 2];
 
 		out.emplace_back(glm::normalize(glm::cross(B - A, C - A)));
 	}
@@ -43,26 +40,26 @@ std::vector<vec3> createNormals(const T& mesh) {
 
 //creates an axis-aligned rectangular prism given two points
 [[nodiscard]]
-constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, float sidelen) {
+constexpr std::array<glm::vec3, 36> createRectMesh(const glm::vec3& p1, const glm::vec3& p2, float sidelen) {
 	float halflen = sidelen * 0.5f;
 
-	float minX = min(p1.x, p2.x) - halflen;
-	float minY = min(p1.y, p2.y) - halflen;
-	float minZ = min(p1.z, p2.z) - halflen;
+	float minX = glm::min(p1.x, p2.x) - halflen;
+	float minY = glm::min(p1.y, p2.y) - halflen;
+	float minZ = glm::min(p1.z, p2.z) - halflen;
 
-	float maxX = max(p1.x, p2.x) + halflen;
-	float maxY = max(p1.y, p2.y) + halflen;
-	float maxZ = max(p1.z, p2.z) + halflen;
+	float maxX = glm::max(p1.x, p2.x) + halflen;
+	float maxY = glm::max(p1.y, p2.y) + halflen;
+	float maxZ = glm::max(p1.z, p2.z) + halflen;
 
-	vec3 vertA(minX, minY, minZ);
-	vec3 vertB(maxX, minY, minZ);
-	vec3 vertC(minX, maxY, minZ);
-	vec3 vertD(maxX, maxY, minZ);
+	glm::vec3 vertA(minX, minY, minZ);
+	glm::vec3 vertB(maxX, minY, minZ);
+	glm::vec3 vertC(minX, maxY, minZ);
+	glm::vec3 vertD(maxX, maxY, minZ);
 
-	vec3 vertG(minX, minY, maxZ);
-	vec3 vertH(maxX, minY, maxZ);
-	vec3 vertE(minX, maxY, maxZ);
-	vec3 vertF(maxX, maxY, maxZ);
+	glm::vec3 vertG(minX, minY, maxZ);
+	glm::vec3 vertH(maxX, minY, maxZ);
+	glm::vec3 vertE(minX, maxY, maxZ);
+	glm::vec3 vertF(maxX, maxY, maxZ);
 
 	return {
 		vertA, vertD, vertB,
@@ -86,20 +83,18 @@ constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, fl
 }
 
 [[nodiscard]]
-std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen) {
+std::vector<glm::vec3> createSnakeMesh(const std::vector<glm::vec3>& points, float sidelen) {
 	if (points.size() < 2) return {};
 
-	std::vector<vec3> out;
+	std::vector<glm::vec3> out;
 	out.reserve(points.size() * 36);
 
 	for (int i = 1; i < points.size(); ++i) {
 		auto p1 = points[i - 1];
 		auto p2 = points[i];
 
-		vec3 dir = normalize(p2 - p1);
-
-		//vec3 endp = p2 - dir * sidelen;
-		vec3 endp = p2;
+		glm::vec3 dir = normalize(p2 - p1);
+		glm::vec3 endp = p2;
 
 		auto verts = createRectMesh(p1, endp, sidelen);
 		for (auto&& vert : verts) {
@@ -110,7 +105,7 @@ std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen
 	return out;
 }
 
-void fillSnakeMeshInterleaved(const std::vector<vec3>& points, PersistentMappedBuffer& buffer, float sidelen, vec4 color) {
+void fillSnakeMeshInterleaved(const std::vector<glm::vec3>& points, PersistentMappedBuffer& buffer, float sidelen, glm::vec4 color) {
 	auto snakeMesh = createSnakeMesh(points, sidelen);
 	auto normals = createNormals(snakeMesh);
 
@@ -118,45 +113,45 @@ void fillSnakeMeshInterleaved(const std::vector<vec3>& points, PersistentMappedB
 		int nIndex = i / 3;
 
 		auto& curA = snakeMesh[i];
-		memcpy(buffer.pointer + buffer.size, &curA, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		memcpy(buffer.pointer + buffer.size, &curA, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 
 		auto& curB = snakeMesh[i + 1];
-		memcpy(buffer.pointer + buffer.size, &curB, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		memcpy(buffer.pointer + buffer.size, &curB, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 
 		auto& curC = snakeMesh[i + 2];
-		memcpy(buffer.pointer + buffer.size, &curC, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		memcpy(buffer.pointer + buffer.size, &curC, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 	}
 }
 
 [[nodiscard]]
-consteval std::array<vec3, 20 * 3> createFoodMesh() {
-	constexpr float a = 0.52573;
-	constexpr float b = 0.85065;
+consteval std::array<glm::vec3, 20 * 3> createFoodMesh() {
+	constexpr float a = 0.52573f;
+	constexpr float b = 0.85065f;
 
 	// adapted from https://github.com/anishagartia/Icosahedron_OpenGL
-	constexpr std::array < vec3, 12> verts = {
-		vec3(-a, 0.0, b), vec3(a, 0.0, b), vec3(-a, 0.0, -b), vec3(a, 0.0, -b),
-		vec3(0.0, b, a), vec3(0.0, b, -a), vec3(0.0, -b, a), vec3(0.0, -b, -a),
-		vec3(b, a, 0.0), vec3(-b, a, 0.0), vec3(b, -a, 0.0), vec3(-b, -a, 0.0)
+	constexpr std::array<glm::vec3, 12> verts = {
+		glm::vec3{ -a, 0.0f, b }, { a, 0.0, b }, { -a, 0.0, -b }, { a, 0.0, -b },
+		{ 0.0, b, a }, { 0.0, b, -a }, { 0.0, -b, a }, { 0.0, -b, -a },
+		{ b, a, 0.0 }, { -b, a, 0.0 }, { b, -a, 0.0 }, { -b, -a, 0.0 }
 	};
 
 	//unit isocahedron
-	constexpr std::array<vec3, 20 * 3> isocahedronMesh = {
+	constexpr std::array<glm::vec3, 20 * 3> isocahedronMesh = {
 		verts[0], verts[4], verts[1],
 		verts[0], verts[9], verts[4],
 		verts[9], verts[5], verts[4],
@@ -183,10 +178,10 @@ consteval std::array<vec3, 20 * 3> createFoodMesh() {
 }
 
 [[nodiscard]]
-constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
-	constexpr std::array<vec3, 20*3> isocahedronMesh = createFoodMesh();
+constexpr std::array<glm::vec3, 20 * 3> createFoodMesh(glm::vec3 pos, float r) {
+	constexpr std::array<glm::vec3, 20*3> isocahedronMesh = createFoodMesh();
 
-	std::array<vec3, 20 * 3> out{};
+	std::array<glm::vec3, 20 * 3> out{};
 	for (int i = 0; i < out.size(); ++i) {
 		out[i] = isocahedronMesh[i] * r + pos;
 	}
@@ -194,35 +189,35 @@ constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
 	return out;
 }
 
-void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos, float radius, vec4 color) {
+void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, const glm::vec3& pos, float radius, const glm::vec4& color) {
 	static constexpr auto isocahedronMesh = createFoodMesh();
 
 	static auto normals = createNormals(isocahedronMesh);
 
 	for (int i = 0; i < 20; i++) {
-		vec3 transformed = isocahedronMesh[i * 3] * radius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		glm::vec3 transformed = isocahedronMesh[i * 3] * radius + pos;
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 
 		transformed = isocahedronMesh[i * 3 + 1] * radius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 
 		transformed = isocahedronMesh[i * 3 + 2] * radius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
-		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
-		buffer.size += sizeof(vec4);
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(glm::vec3));
+		buffer.size += sizeof(glm::vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(glm::vec4));
+		buffer.size += sizeof(glm::vec4);
 	}
 }
 
