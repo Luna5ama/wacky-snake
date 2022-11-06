@@ -185,7 +185,7 @@ public:
     };
 };
 
-VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor): stride(stride), divisor(divisor) {}
+VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor, GLuint offset): stride(stride), divisor(divisor), offset(offset) {}
 
 unsigned int getSize(GLenum type) {
     int result = 0;
@@ -211,13 +211,13 @@ unsigned int getSize(GLenum type) {
 }
 
 VertexAttribute::Builder& VertexAttribute::Builder::addInt(GLuint index, GLint size, GLenum type) {
-    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Int(index, size, type, offset));
+    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Int(index, size, type, this->offset));
     offset += size * getSize(type);
     return *this;
 }
 
 VertexAttribute::Builder& VertexAttribute::Builder::addFloat(GLuint index, GLint size, GLenum type, GLboolean normalized) {
-    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Float(index, size, type, offset, normalized));
+    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Float(index, size, type, this->offset, normalized));
     offset += size * getSize(type);
     return *this;
 }
@@ -367,14 +367,17 @@ GLint createShader(const std::string path, GLenum shaderType) {
     glShaderSource(id, 1, &codeSrcCStr, NULL);
     glCompileShader(id);
 
-    GLint logLength;
-    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
+    GLint compiled = 0;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &compiled);
+    if (compiled == GL_FALSE) {
+        GLint logLength;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (logLength > 0) {
-        char* infoLog = new char(logLength + 1);
-        glGetShaderInfoLog(id, logLength, NULL, infoLog);
-        std::cerr << infoLog << std::endl;
-        delete infoLog;
+        if (logLength > 0) {
+            std::vector<GLchar> infoLog(logLength);
+            glGetShaderInfoLog(id, logLength, &logLength, &infoLog[0]);
+            std::cout << &infoLog[0] << std::endl;
+        }
     }
 
     return id;
@@ -390,14 +393,17 @@ OpenGL::ShaderProgram::ShaderProgram(const std::string vertex, const std::string
 
     glLinkProgram(this->id);
 
-    GLint logLength;
-    glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logLength);
+    GLint linked = 0;
+    glGetProgramiv(this->id, GL_LINK_STATUS, &linked);
+    if (linked == GL_FALSE) {
+        GLint logLength;
+        glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (logLength > 0) {
-        char* infoLog = new char(logLength + 1);
-        glGetProgramInfoLog(this->id, logLength, NULL, infoLog);
-        std::cout << infoLog << std::endl;
-        delete infoLog;
+        if (logLength > 0) {
+            std::vector<GLchar> infoLog(logLength);
+            glGetProgramInfoLog(this->id, logLength, &logLength, &infoLog[0]);
+            std::cout << &infoLog[0] << std::endl;
+        }
     }
 
     glDetachShader(this->id, vert);

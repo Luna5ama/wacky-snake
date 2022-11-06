@@ -22,27 +22,7 @@ void Camera::updateView(glm::vec2 mousePosDelta) {
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
-SkyboxShaderProgram::SkyboxShaderProgram() : OpenGL::ShaderProgram("resources/shaders/Background.vert.glsl", "resources/shaders/Background.frag.glsl") {
-	this->mouseUniform = glGetUniformLocation(this->id, "mouse");
-}
-
-SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {
-	glm::vec2 shaderVertices[] = {
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ -1.0f, 1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		{ 1.0f, -1.0f }
-	};
-	this->skyboxVBO.allocate(&shaderVertices, sizeof(shaderVertices), 0);
-	this->skyboxVAO.attachVertexBuffer(
-		this->skyboxVBO,
-		OpenGL::VertexAttribute::Builder(8)
-		.addFloat(0, 2, GL_FLOAT, false)
-		.build()
-	);
-	
+SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {	
 	glm::vec3 borderVertices[] = {
 		// Down
 		{ 128.0f, -128.0f, -128.0f },
@@ -97,23 +77,11 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 }
 
 void SkyboxRenderer::render(GameWindow& gameWindow) {
-	this->skyboxShaderProgram.bind();
-	this->skyboxShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->renderEngine.globalUBO, "Global");
-	glm::f64vec2 mousePos;
-	glfwGetCursorPos(gameWindow.window, &mousePos.x, &mousePos.y);
-	glm::vec2 normMousePos(((GLfloat)mousePos.x) / gameWindow.windowSize.x,
-		1.0f - ((GLfloat)mousePos.y) / gameWindow.windowSize.y);
-	glUniform2f(
-		this->skyboxShaderProgram.mouseUniform,
-		normMousePos.x, normMousePos.y
-	);
-	this->skyboxVAO.bind();
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
-
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	this->borderShaderProgram.bind();
+	this->borderShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->renderEngine.globalUBO, "Global");
 	this->borderVAO.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }

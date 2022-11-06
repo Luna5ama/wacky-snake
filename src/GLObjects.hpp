@@ -85,7 +85,7 @@ namespace OpenGL {
             GLuint offset;
             std::vector<VertexAttribute::Entry*> entries;
         public:
-            Builder(GLsizei stride, GLuint divisor = 0);
+			Builder(GLsizei stride, GLuint divisor = 0, GLuint offset = 0);
 
             VertexAttribute::Builder& addInt(GLuint index, GLint size, GLenum type);
             VertexAttribute::Builder& addFloat(GLuint index, GLint size, GLenum type, GLboolean normalized);

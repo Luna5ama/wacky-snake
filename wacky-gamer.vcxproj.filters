@@ -43,6 +43,5 @@
     <EmbeddedResource Include="resources\shaders\Background.vert.glsl" />
     <EmbeddedResource Include="resources\shaders\Border.frag.glsl" />
     <EmbeddedResource Include="resources\shaders\Border.vert.glsl" />
-    <EmbeddedResource Include="resources\shaders\Background.frag.glsl" />
   </ItemGroup>
 </Project>
