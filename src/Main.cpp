@@ -77,12 +77,18 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
             break;
         case GLFW_KEY_R: // restart
-            game.player = Snake();
-            game.state = State::Waiting;
-            game.timeElapsed = 0.0;
-            game.world.objects = {};
-            game.placeFood(INITIAL_FOODS);
+            if (controlled) {
+                game.player = Snake();
+                game.state = State::Waiting;
+                game.timeElapsed = 0.0;
+                game.world.objects = {};
+                game.placeFood(INITIAL_FOODS);
+            }
             break;
+        case GLFW_KEY_F: // force end
+            if (controlled) {
+                game.state = State::Overing;
+            }
         default:
             break;
         }
