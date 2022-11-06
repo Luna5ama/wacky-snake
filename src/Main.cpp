@@ -48,7 +48,7 @@ int main() {
     glEnable(GL_CULL_FACE);
 
     // Setup here
-	SkyboxRenderer skyboxRenderer;
+	RenderEngine renderEngine;
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -66,11 +66,14 @@ int main() {
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, windowSize.x, windowSize.y);
 
         // Render goes here
-		skyboxRenderer.render();
+        renderEngine.camera.updateProjection(windowSize);
+		renderEngine.setupGlobalUBO(windowSize, 0.0f);
+		renderEngine.skyboxRenderer.render();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

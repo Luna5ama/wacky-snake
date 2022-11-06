@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <string>
+#include <unordered_map>
 
 namespace OpenGL {
     class IGLObject {
@@ -183,11 +184,15 @@ namespace OpenGL {
     };
 
     class ShaderProgram : public IGLBinding {
+    private:
+        std::unordered_map<std::string, GLuint> bindings;
     public:
         ShaderProgram(const std::string vertex, const std::string fragment);
         ~ShaderProgram();
 
         void destroy() const override;
         void bind0(const GLuint id) const override;
+
+		void bindBuffer(const GLuint target, const BufferObject buffer, const std::string& blockName, const GLintptr offset = -1, const GLsizeiptr size = -1);
     };
 }

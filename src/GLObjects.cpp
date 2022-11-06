@@ -419,3 +419,15 @@ OpenGL::ShaderProgram::~ShaderProgram() {
 void OpenGL::ShaderProgram::bind0(const GLuint id) const {
     glUseProgram(id);
 }
+
+void OpenGL::ShaderProgram::bindBuffer(const GLuint target, const BufferObject buffer, const std::string& blockName, const GLintptr offset, const GLsizeiptr size) {
+	if (this->bindings.find(blockName) == this->bindings.end()) {
+	    this->bindings[blockName] = this->bindings.size();
+	}
+	GLuint bindingIndex = this->bindings[blockName];
+    if (offset == -1 || size == -1) {
+        glBindBufferBase(target, bindingIndex, buffer.id);
+    } else {
+		glBindBufferRange(target, bindingIndex, buffer.id, offset, size);
+    }
+}
