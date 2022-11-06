@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Game.hpp"
+#include "game/Game.hpp"
 #include <glm/glm.hpp>
 #include "GLObjects.hpp"
 #include "Main.hpp"

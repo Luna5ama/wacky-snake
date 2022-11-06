@@ -142,20 +142,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GLObjects.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\MathUtils.cpp" />
     <ClCompile Include="src\RenderEngine.cpp" />
-    <ClCompile Include="src\Snake.cpp" />
-    <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Game.hpp" />
-    <ClInclude Include="src\Object.hpp" />
+    <ClInclude Include="src\game\Game.hpp" />
+    <ClInclude Include="src\game\Object.hpp" />
     <ClInclude Include="src\RenderEngine.hpp" />
-    <ClInclude Include="src\Snake.hpp" />
-    <ClInclude Include="src\World.hpp" />
+    <ClInclude Include="src\game\Snake.hpp" />
+    <ClInclude Include="src\game\World.hpp" />
     <ClInclude Include="src\GLObjects.hpp" />
     <ClInclude Include="src\MathUtils.hpp" />
     <ClInclude Include="src\Mesh.hpp" />

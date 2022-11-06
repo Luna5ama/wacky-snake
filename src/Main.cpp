@@ -1,10 +1,14 @@
-#include <gl/glew.h>
-#include "Main.hpp"
+
+
 #include <iostream>
 #include <string>
+
+#include <gl/glew.h>
 #include <GLFW/glfw3.h>
 #include "RenderEngine.hpp"
-#include "Game.hpp"
+#include "game/Game.hpp"
+
+#include "Main.hpp"
 
 // Debug message handler
 void GLAPIENTRY messageCallback(GLenum source,

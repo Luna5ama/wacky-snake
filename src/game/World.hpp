@@ -9,7 +9,7 @@ struct World {
 	std::random_device rd;
 	std::default_random_engine re;
 
-	World();
+	World() : objects(), rd(), re(rd()) {};
 
 	// returns nullptr on failure, ignores None items
 	// type T must have distance function that takes an Object as input
