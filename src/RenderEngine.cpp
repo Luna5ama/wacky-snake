@@ -20,7 +20,9 @@ void Camera::updateModelView(Game& game, glm::vec2 mousePosDelta) {
 	this->matrix.modelView = glm::identity<glm::mat4>();
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
 	this->matrix.modelView = glm::rotate(this->matrix.modelView, glm::radians(this->rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-	this->matrix.modelView = glm::translate(this->matrix.modelView, -game.player.segments[0]); 
+	if (game.player.segments.size() > 0) {
+		this->matrix.modelView = glm::translate(this->matrix.modelView, -game.player.segments[0]);
+	}
 	glm::vec2 sin = glm::sin(glm::radians(this->rotation));
 	glm::vec2 cos = glm::cos(glm::radians(this->rotation));
 	glm::vec3 dir = glm::vec3(-sin.x * cos.y, sin.y, cos.x * cos.y);

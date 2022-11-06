@@ -31,14 +31,14 @@ public:
 	size_t foodsEaten = 0;
 
 	static constexpr float radius = 0.5f;
-	static constexpr float speed = 1.0f; // speed in m/s
-	//static constexpr float shrinkage = 0.926118f;
-	static constexpr float shrinkage = 1.0f;
+	static constexpr float speed = 2.0f; // speed in m/s
+	static constexpr float shrinkage = 0.926118f;
+	//static constexpr float shrinkage = 1.0f;
 
 	Snake() :
-		segments({ glm::vec3(0.0, -5.0, 0.0), glm::vec3(0.0, -5.0, -10.0) }),
-		rotation(glm::vec3(0.0, 0.0, 1.0)),
-		length(10.0f) {}
+		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -20.0) }),
+		rotation(),
+		length(20.0f) {}
 
 	void setRotation(glm::vec2 rotation) {
 		rotation.x = normalizeAngle(rotation.x);
