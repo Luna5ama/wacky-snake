@@ -133,8 +133,10 @@ int main() {
 	glfwGetCursorPos(gameWindow.window, &prevMousePos.x, &prevMousePos.y);
     glm::f64vec2 mousePos;
 
+    #ifdef _DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, 0);
+    #endif
 
     // Setup here
 	RenderEngine renderEngine;
