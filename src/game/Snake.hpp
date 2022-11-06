@@ -32,8 +32,7 @@ public:
 
 	static constexpr float radius = 0.5f;
 	static constexpr float speed = 2.0f; // speed in m/s
-	static constexpr float shrinkage = 0.926118f;
-	//static constexpr float shrinkage = 1.0f;
+	float shrinkage = glm::pow(0.5f, 1.0f / 30.0f);
 
 	Snake() :
 		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -20.0) }),

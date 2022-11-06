@@ -149,7 +149,7 @@ void setupMesh(RenderEngine& renderEngine, Game& game, float tickDelta) {
 	renderEngine.worldObjVertexCount = renderEngine.buffer.size / 40;
 	renderEngine.buffer.finish();
 
-	fillSnakeMeshInterleaved(game.player.segments, renderEngine.buffer, Snake::radius, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	fillSnakeMeshInterleaved(game.player.segments, renderEngine.buffer, Snake::radius, glm::vec4(0.1f, 0.8f, 0.1f, 1.0f));
 	renderEngine.snakeVAO.clearAttachments();
 	renderEngine.snakeVAO.attachVertexBuffer(
 		renderEngine.buffer.buffer,
