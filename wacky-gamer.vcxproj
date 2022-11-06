@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="src\GLObjects.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\RenderEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\Game.hpp" />
@@ -141,6 +142,10 @@
     <ClInclude Include="src\mesh.hpp" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\RenderEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\shaders\Border.frag.glsl" />
+    <None Include="resources\shaders\Border.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

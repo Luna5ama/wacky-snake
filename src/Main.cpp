@@ -47,7 +47,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             game.player.setDirection(glm::vec3(0.0, -1.0, 0.0));
             break;
             
-        case GLFW_KEY_ESC:
+        case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GL_TRUE);
             break;
         default:
