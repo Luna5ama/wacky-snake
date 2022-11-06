@@ -50,7 +50,7 @@ class Snake {
 public:
 
 	static constexpr float radius = 0.5f;
-	static constexpr float speed = 0.05f;
+	static constexpr float speed = 1.0f; // speed in m/s
 	static constexpr float shrinkage = 0.926118f;
 
 	std::vector<glm::vec3> segments;
@@ -63,7 +63,7 @@ public:
 	Snake() :
 		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -10.0) }),
 		direction(glm::vec3(0.0, 0.0, 1.0)),
-		length(1.0f) {}
+		length(10.0f) {}
 
 	void setDirection(glm::vec3 dir) {
 		if (dir != direction) {
@@ -108,6 +108,29 @@ public:
 		return dist(obj) <= 0.0;
 	}
 
+	void shrinkLen(float len) {
+		while (len > 0.0f && segments.size() > 1) {
+			auto& cur = segments.back();
+			const auto& prev = *(segments.end() - 2);
+
+			auto dir = prev - cur;
+
+			float mLen = glm::length(dir);
+
+			if (len > mLen) {
+				segments.pop_back();
+				len -= mLen;
+			}
+			else {
+				glm::vec3 ndir = glm::normalize(dir);
+				cur += ndir * len;
+				len = 0.0f;
+			}
+		}
+
+		if (len > 0.0f) [[unlikely]] segments = {};
+	}
+
 	void shrink(float dt) {
 		using namespace std::numbers;
 
@@ -118,30 +141,11 @@ public:
 			length = 0.0f;
 		}
 		else {
+			float dLength = length - newLength;
+
 			length = newLength;
 
-			float dLength = newLength - length;
-
-			while (dLength > 0.0f && segments.size() > 1) {
-				auto& cur = segments.back();
-				const auto& prev = *(segments.end() - 2);
-
-				auto dir = prev - cur;
-
-				float mLen = glm::length(dir);
-				
-				if (dLength > mLen) {
-					segments.pop_back();
-					dLength -= mLen;
-				}
-				else {
-					glm::vec3 ndir = glm::normalize(dir);
-					cur += ndir * dLength;
-					dLength = 0.0f;
-				}
-			}
-
-			if (dLength > 0.0f) [[unlikely]] segments = {};
+			shrinkLen(dLength);
 		}
 	}
 
@@ -200,6 +204,7 @@ public:
 		}
 
 		head = target;
+		shrinkLen(speed*dt);
 		return true;
 	};
 };
