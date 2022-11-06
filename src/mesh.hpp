@@ -7,6 +7,8 @@
 
 using namespace glm;
 
+//creates an axis-aligned rectangular prism given two points
+[[nodiscard]]
 constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, float sidelen) {
 	float halflen = sidelen * 0.5f;
 
@@ -49,6 +51,7 @@ constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, fl
 	};
 }
 
+[[nodiscard]]
 std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen) {
 	std::vector<vec3> out;
 	out.reserve(points.size() * 36);
@@ -70,6 +73,50 @@ std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen
 	auto verts = createRectMesh(points.back(), points.back(), sidelen);
 	for (auto&& vert : verts) {
 		out.emplace_back(vert);
+	}
+
+	return out;
+}
+
+[[nodiscard]]
+constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
+	constexpr float a = 0.52573;
+	constexpr float b = 0.85065;
+
+	// adapted from https://github.com/anishagartia/Icosahedron_OpenGL
+	constexpr std::array < vec3, 12> verts = {
+		vec3(-a, 0.0, b), vec3(a, 0.0, b), vec3(-a, 0.0, -b), vec3(a, 0.0, -b),
+		vec3(0.0, b, a), vec3(0.0, b, -a), vec3(0.0, -b, a), vec3(0.0, -b, -a),
+		vec3(b, a, 0.0), vec3(-b, a, 0.0), vec3(b, -a, 0.0), vec3(-b, -a, 0.0)
+	};
+
+	//unit isocahedron
+	constexpr std::array<vec3, 20 * 3> isocahedronMesh = {
+		verts[0], verts[4], verts[1],
+		verts[0], verts[9], verts[4],
+		verts[9], verts[5], verts[4],
+		verts[4], verts[5], verts[8],
+		verts[4], verts[8], verts[1],
+		verts[8], verts[10], verts[1],
+		verts[8], verts[3], verts[10],
+		verts[5], verts[3], verts[8],
+		verts[5], verts[2], verts[3],
+		verts[2], verts[7], verts[3],
+		verts[7], verts[10], verts[3],
+		verts[7], verts[6], verts[10],
+		verts[7], verts[11], verts[6],
+		verts[11], verts[0], verts[6],
+		verts[0], verts[1], verts[6],
+		verts[6], verts[1], verts[10],
+		verts[9], verts[0], verts[11],
+		verts[9], verts[11], verts[2],
+		verts[9], verts[2], verts[5],
+		verts[7], verts[2], verts[11],
+	};
+
+	std::array<vec3, 20 * 3> out{};
+	for (int i = 0; i < out.size(); ++i) {
+		out[i] = isocahedronMesh[i] * r + pos;
 	}
 
 	return out;

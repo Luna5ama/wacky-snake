@@ -134,10 +134,18 @@
     <ClCompile Include="src\RenderEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GameLogics.h" />
+    <ClInclude Include="src\game\Game.hpp" />
+    <ClInclude Include="src\game\Object.hpp" />
+    <ClInclude Include="src\game\Snake.hpp" />
+    <ClInclude Include="src\game\World.hpp" />
     <ClInclude Include="src\GLObjects.hpp" />
+    <ClInclude Include="src\mesh.hpp" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\RenderEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\shaders\Border.frag.glsl" />
+    <None Include="resources\shaders\Border.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

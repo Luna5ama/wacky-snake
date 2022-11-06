@@ -5,11 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "RenderEngine.h"
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, GL_TRUE);
-    }
-}
+#include "game/Game.hpp"
 
 // Debug message handler
 void GLAPIENTRY messageCallback(GLenum source,
@@ -22,6 +18,42 @@ void GLAPIENTRY messageCallback(GLenum source,
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
         (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
         type, severity, message);
+}
+
+// game instance
+Game game{};
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        switch (key)
+        {
+        case GLFW_KEY_W:
+            game.player.setDirection(glm::vec3(0.0, 0.0, 1.0));
+            break;
+        case GLFW_KEY_A:
+            game.player.setDirection(glm::vec3(-1.0, 0.0, 0.0));
+            break;
+        case GLFW_KEY_S:
+            game.player.setDirection(glm::vec3(0.0, 0.0, -1.0));
+            break;
+        case GLFW_KEY_D:
+            game.player.setDirection(glm::vec3(1.0, 0.0, 0.0));
+            break;
+
+        case GLFW_KEY_SPACE:
+            game.player.setDirection(glm::vec3(0.0, 1.0, 0.0));
+            break;
+        case GLFW_KEY_LEFT_SHIFT:
+            game.player.setDirection(glm::vec3(0.0, -1.0, 0.0));
+            break;
+            
+        case GLFW_KEY_ESCAPE:
+            glfwSetWindowShouldClose(window, GL_TRUE);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 int main() {
@@ -47,6 +79,7 @@ int main() {
 
     // Mouse/Keyboard callbacks
     //glfwSetMouseButtonCallback(window, mouseButtonCallback);
+
     glfwSetKeyCallback(gameWindow.window, keyCallback);
     glm::f64vec2 prevMousePos;
 	glfwGetCursorPos(gameWindow.window, &prevMousePos.x, &prevMousePos.y);
@@ -63,6 +96,12 @@ int main() {
         std::cerr << "Pre render OpenGL error: " << err << std::endl;
     }
 
+
+    double curTime = glfwGetTime();
+
+    // game initialization
+    game.placeFood(10);
+
     while (!glfwWindowShouldClose(gameWindow.window)) {
         glfwPollEvents();
         // Process inputs here
@@ -71,6 +110,11 @@ int main() {
 		glm::f32vec2 mouseDelta = mousePos - prevMousePos;
         glfwSetCursorPos(gameWindow.window, center.x, center.y);
         glfwGetCursorPos(gameWindow.window, &prevMousePos.x, &prevMousePos.y);
+
+        double time = glfwGetTime();
+        double dt = time - curTime;
+        curTime = time;
+        game.tick(dt);
 
         glfwGetWindowSize(gameWindow.window, &gameWindow.windowSize.x, &gameWindow.windowSize.y);
 
