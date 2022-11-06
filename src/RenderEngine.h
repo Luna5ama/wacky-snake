@@ -35,6 +35,18 @@ struct SkyboxRenderer {
     void render(GameWindow& gameWindow);
 };
 
+class PersistentMappedBuffer {
+private:
+	uint32_t frame;
+public:
+	OpenGL::BufferObject::Immutable buffer;
+	void* originPtr;
+	void* ptr;
+
+	PersistentMappedBuffer(GLsizeiptr size);
+	void update();
+};
+
 class RenderEngine {
 public:
 	Camera camera;

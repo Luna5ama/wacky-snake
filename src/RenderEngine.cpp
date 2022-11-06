@@ -111,3 +111,22 @@ void RenderEngine::setup(GameWindow& gameWindow, float tickDelta) {
 	this->globalUBO.invalidate();
 	glNamedBufferSubData(this->globalUBO.id, 0, 268, mem);
 }
+
+PersistentMappedBuffer::PersistentMappedBuffer(GLsizeiptr size) : frame(0) {
+	this->buffer.allocate(size, GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+	this->originPtr = glMapNamedBufferRange(
+		this->buffer.id,
+		0,
+		size,
+		GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_UNSYNCHRONIZED_BIT
+	);
+	this->ptr = this->originPtr;
+}
+
+void PersistentMappedBuffer::update() {
+	frame++;
+	if (frame == 2) {
+		ptr = originPtr;
+		frame = 0;
+	}
+}
