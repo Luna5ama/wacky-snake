@@ -21,10 +21,22 @@ void GLAPIENTRY messageCallback(GLenum source,
 }
 
 // game instance
+constexpr int INITIAL_FOODS = 1000;
 Game game{};
 
+bool controlled = false;
+bool wireframe = false;
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (key == GLFW_KEY_LEFT_CONTROL) {
+        if (action == GLFW_PRESS) {
+            controlled = true;
+        }
+        else if (action == GLFW_RELEASE) {
+            controlled = false;
+        }
+    }
+    else if (action == GLFW_PRESS || action == GLFW_REPEAT) {
         switch (key)
         {
         case GLFW_KEY_W:
@@ -49,6 +61,27 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GL_TRUE);
+            break;
+
+
+        // debug controls
+        case GLFW_KEY_T: // wireframe toggle
+            if (controlled) {
+                wireframe = !wireframe;
+                if (wireframe) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+            }
+            break;
+        case GLFW_KEY_R: // restart
+            game.player = Snake();
+            game.state = State::Waiting;
+            game.timeElapsed = 0.0;
+            game.world.objects = {};
+            game.placeFood(INITIAL_FOODS);
             break;
         default:
             break;
@@ -101,7 +134,7 @@ int main() {
     double lastTickTime = curTime;
 
     // game initialization
-    game.placeFood(1000);
+    game.placeFood(INITIAL_FOODS);
 
     while (!glfwWindowShouldClose(gameWindow.window)) {
         glfwPollEvents();
