@@ -56,5 +56,5 @@ void main() {
 	fragColor.a += 0.8 * smoothstep(100.0, 215.0, length(rawPos));
 	fragColor.rgb *= fragColor.a;
 	fragColor.a = 1.0;
-	fragColor.rgb += smoothstep(0.9, 1.0, dotNoise(rawPos / 2.0, 2.0, 0.1));
+	fragColor.rgb += smoothstep(0.9, 1.0, dotNoise(rawPos, 2.0, 0.01));
 }

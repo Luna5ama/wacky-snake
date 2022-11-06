@@ -98,6 +98,7 @@ int main() {
 
 
     double curTime = glfwGetTime();
+    double lastTickTime = curTime;
 
     // game initialization
     game.placeFood(10);
@@ -131,8 +132,9 @@ int main() {
         // Render goes here
         renderEngine.camera.updateProjection(gameWindow);
         renderEngine.camera.updateView(mouseDelta);
-		renderEngine.setup(gameWindow, 0.0f);
+		renderEngine.setup(gameWindow, game, dt);
 		renderEngine.skyboxRenderer.render(gameWindow);
+		renderEngine.render(gameWindow, dt);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

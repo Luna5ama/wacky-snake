@@ -1,16 +1,16 @@
 #include "RenderEngine.h"
+#include "Mesh.hpp"
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 #include "Main.h"
-
 #include <iostream>
 
-Camera::Camera() : matrix(), rotation(), fov(90.0f) {}
+Camera::Camera() : matrix(), rotation(), fov(60.0f) {}
 
 void Camera::updateProjection(GameWindow& gameWindow) {
-	this->matrix.projection = glm::perspective(this->fov, (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 1024.0f);
+	this->matrix.projection = glm::perspective(glm::radians(this->fov), (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 1024.0f);
 }
 	
 void Camera::updateView(glm::vec2 mousePosDelta) {
@@ -86,18 +86,22 @@ void SkyboxRenderer::render(GameWindow& gameWindow) {
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-RenderEngine::RenderEngine() : skyboxRenderer(*this) {
+RenderEngine::RenderEngine(): 
+	skyboxRenderer(*this), 
+	buffer(1024 * 1024 * 8),
+	genericDrawShaderProgram("resources/shaders/GenericDraw.vert.glsl", "resources/shaders/GenericDraw.frag.glsl"), 
+	worldObjVertexCount(0), snakeVertexCount(0) {
 	globalUBO.allocate(268, GL_DYNAMIC_STORAGE_BIT);
 }
 
-void RenderEngine::setup(GameWindow& gameWindow, float tickDelta) {
+void setupUBO(RenderEngine& renderEngine, GameWindow& gameWindow, float tickDelta) {
 	char mem[268];
 	size_t i = 0;
-	memcpy(mem + i, &this->camera.matrix, sizeof(ProjViewModelMatrix));
+	memcpy(mem + i, &renderEngine.camera.matrix, sizeof(ProjViewModelMatrix));
 	i += sizeof(ProjViewModelMatrix);
-	
-	glm::mat4 inverseProjectionMatrix = glm::inverse(this->camera.matrix.projection);
-	glm::mat4 inverseModelViewMatrix = glm::inverse(this->camera.matrix.modelView);
+
+	glm::mat4 inverseProjectionMatrix = glm::inverse(renderEngine.camera.matrix.projection);
+	glm::mat4 inverseModelViewMatrix = glm::inverse(renderEngine.camera.matrix.modelView);
 	memcpy(mem + i, &inverseProjectionMatrix, sizeof(glm::mat4));
 	i += sizeof(glm::mat4);
 	memcpy(mem + i, &inverseModelViewMatrix, sizeof(glm::mat4));
@@ -108,17 +112,57 @@ void RenderEngine::setup(GameWindow& gameWindow, float tickDelta) {
 
 	mem[i] = tickDelta;
 
-	this->globalUBO.invalidate();
-	glNamedBufferSubData(this->globalUBO.id, 0, 268, mem);
+	renderEngine.globalUBO.invalidate();
+	glNamedBufferSubData(renderEngine.globalUBO.id, 0, 268, mem);
+}
+
+void setupMesh(RenderEngine& renderEngine, Game& game, float tickDelta) {
+	renderEngine.buffer.update();
+	std::vector<ItemObj>& worldObjs = game.world.objects;
+	for (int i = 0; i < worldObjs.size(); i++) {
+		ItemObj& obj = worldObjs[i];
+		switch (obj.item) {
+			case Item::Food:
+				fillFoodMeshInterleaved(renderEngine.buffer, obj.pos, obj.radius, { 0.0f, 1.0f, 0.0f, 1.0f });
+				break;
+			default:
+				// ADD more
+				break;
+		}
+	}
+	renderEngine.worldObjVAO.clearAttachments();
+	renderEngine.worldObjVAO.attachVertexBuffer(
+		renderEngine.buffer.buffer,
+		renderEngine.buffer.offset(),
+		OpenGL::VertexAttribute::Builder(40)
+		.addFloat(0, 3, GL_FLOAT, false)
+		.addFloat(1, 3, GL_FLOAT, false)
+		.addFloat(2, 4, GL_FLOAT, false)
+		.build()
+	);
+	renderEngine.worldObjVertexCount = renderEngine.buffer.size / 40;
+	renderEngine.buffer.finish();
+}
+
+void RenderEngine::setup(GameWindow& gameWindow, Game& game, float tickDelta) {
+	setupUBO(*this, gameWindow, tickDelta);
+	setupMesh(*this, game, tickDelta);
+}
+
+void RenderEngine::render(GameWindow& gameWindow, float tickDelta) {
+	this->genericDrawShaderProgram.bind();
+	this->genericDrawShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->globalUBO, "Global");
+	this->worldObjVAO.bind();
+	glDrawArrays(GL_TRIANGLES, 0, this->worldObjVertexCount);
 }
 
 PersistentMappedBuffer::PersistentMappedBuffer(GLsizeiptr size) : frame(0), size(0) {
-	this->buffer.allocate(size, GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+	this->buffer.allocate(size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 	this->originPtr = (char8_t*) glMapNamedBufferRange(
 		this->buffer.id,
 		0,
 		size,
-		GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_UNSYNCHRONIZED_BIT
+		GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_UNSYNCHRONIZED_BIT
 	);
 	this->pointer = this->originPtr;
 }
@@ -134,4 +178,8 @@ void PersistentMappedBuffer::update() {
 void PersistentMappedBuffer::finish() {
 	pointer += size;
 	size = 0;
+}
+
+GLuint PersistentMappedBuffer::offset() const {
+	return (GLuint) (pointer - originPtr);
 }

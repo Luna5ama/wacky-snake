@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/Game.hpp"
 #include <glm/glm.hpp>
 #include "GLObjects.hpp"
 #include "Main.h"
@@ -47,15 +48,24 @@ public:
 	PersistentMappedBuffer(GLsizeiptr size);
 	void update();
 	void finish();
+	GLuint offset() const;
 };
 
 class RenderEngine {
 public:
 	Camera camera;
 	OpenGL::BufferObject::Immutable globalUBO;
+	PersistentMappedBuffer buffer;
 	SkyboxRenderer skyboxRenderer;
+	
+	OpenGL::ShaderProgram genericDrawShaderProgram;
+	OpenGL::VertexArrayObject worldObjVAO;
+	GLsizei worldObjVertexCount;
+	OpenGL::VertexArrayObject snakeVAO;
+	GLsizei snakeVertexCount;
 	
 	RenderEngine();
 	
-	void setup(GameWindow& gameWindow, float tickDelta);
+	void setup(GameWindow& gameWindow, Game& game, float tickDelta);
+	void render(GameWindow& gameWindow, float tickDelta);
 };

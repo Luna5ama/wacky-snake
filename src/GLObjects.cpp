@@ -185,7 +185,7 @@ public:
     };
 };
 
-VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor, GLuint offset): stride(stride), divisor(divisor), offset(offset) {}
+VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor): stride(stride), divisor(divisor), offset(0) {}
 
 unsigned int getSize(GLenum type) {
     int result = 0;
