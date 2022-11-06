@@ -1,4 +1,7 @@
 #include <iostream>
+#include<fstream>
+#include<sstream>
+#include <string>
 #include "GLObjects.hpp"
 
 using namespace OpenGL;
@@ -182,7 +185,7 @@ public:
     };
 };
 
-VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor): stride(stride), divisor(divisor) {}
+VertexAttribute::Builder::Builder(GLsizei stride, GLuint divisor, GLuint offset): stride(stride), divisor(divisor), offset(offset) {}
 
 unsigned int getSize(GLenum type) {
     int result = 0;
@@ -208,13 +211,13 @@ unsigned int getSize(GLenum type) {
 }
 
 VertexAttribute::Builder& VertexAttribute::Builder::addInt(GLuint index, GLint size, GLenum type) {
-    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Int(index, size, type, offset));
+    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Int(index, size, type, this->offset));
     offset += size * getSize(type);
     return *this;
 }
 
 VertexAttribute::Builder& VertexAttribute::Builder::addFloat(GLuint index, GLint size, GLenum type, GLboolean normalized) {
-    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Float(index, size, type, offset, normalized));
+    entries.push_back((VertexAttribute::Entry*) new VertexAttribute::Entry::Float(index, size, type, this->offset, normalized));
     offset += size * getSize(type);
     return *this;
 }
@@ -352,27 +355,35 @@ void Framebuffer::destroyAll() {
     depthAttachment = NULL;
 }
 
-GLint createShader(const std::string& codeSrc, GLenum shaderType) {
+GLint createShader(const std::string path, GLenum shaderType) {
+    std::ifstream t(path);
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+	
+	std::string codeSrc = buffer.str();	
     const GLchar* codeSrcCStr = codeSrc.c_str();
 
     GLint id = glCreateShader(shaderType);
     glShaderSource(id, 1, &codeSrcCStr, NULL);
     glCompileShader(id);
 
-    GLint logLength;
-    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
+    GLint compiled = 0;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &compiled);
+    if (compiled == GL_FALSE) {
+        GLint logLength;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (logLength > 0) {
-        char* infoLog = new char(logLength + 1);
-        glGetShaderInfoLog(id, logLength, NULL, infoLog);
-        std::cerr << infoLog << std::endl;
-        delete infoLog;
+        if (logLength > 0) {
+            std::vector<GLchar> infoLog(logLength);
+            glGetShaderInfoLog(id, logLength, &logLength, &infoLog[0]);
+            std::cout << &infoLog[0] << std::endl;
+        }
     }
 
     return id;
 }
 
-OpenGL::ShaderProgram::ShaderProgram(const std::string& vertex, const std::string& fragment) {
+OpenGL::ShaderProgram::ShaderProgram(const std::string vertex, const std::string fragment) {
     this->id = glCreateProgram();
     int vert = createShader(vertex, GL_VERTEX_SHADER);
     int frag = createShader(fragment, GL_FRAGMENT_SHADER);
@@ -382,14 +393,17 @@ OpenGL::ShaderProgram::ShaderProgram(const std::string& vertex, const std::strin
 
     glLinkProgram(this->id);
 
-    GLint logLength;
-    glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logLength);
+    GLint linked = 0;
+    glGetProgramiv(this->id, GL_LINK_STATUS, &linked);
+    if (linked == GL_FALSE) {
+        GLint logLength;
+        glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (logLength > 0) {
-        char* infoLog = new char(logLength + 1);
-        glGetProgramInfoLog(this->id, logLength, NULL, infoLog);
-        std::cout << infoLog << std::endl;
-        delete infoLog;
+        if (logLength > 0) {
+            std::vector<GLchar> infoLog(logLength);
+            glGetProgramInfoLog(this->id, logLength, &logLength, &infoLog[0]);
+            std::cout << &infoLog[0] << std::endl;
+        }
     }
 
     glDetachShader(this->id, vert);
@@ -410,4 +424,16 @@ OpenGL::ShaderProgram::~ShaderProgram() {
 
 void OpenGL::ShaderProgram::bind0(const GLuint id) const {
     glUseProgram(id);
+}
+
+void OpenGL::ShaderProgram::bindBuffer(const GLuint target, const BufferObject buffer, const std::string& blockName, const GLintptr offset, const GLsizeiptr size) {
+	if (this->bindings.find(blockName) == this->bindings.end()) {
+	    this->bindings[blockName] = this->bindings.size();
+	}
+	GLuint bindingIndex = this->bindings[blockName];
+    if (offset == -1 || size == -1) {
+        glBindBufferBase(target, bindingIndex, buffer.id);
+    } else {
+		glBindBufferRange(target, bindingIndex, buffer.id, offset, size);
+    }
 }

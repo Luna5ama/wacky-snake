@@ -139,6 +139,8 @@
     <ClInclude Include="src\game\World.hpp" />
     <ClInclude Include="src\GLObjects.hpp" />
     <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\Main.h" />
+    <ClInclude Include="src\RenderEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

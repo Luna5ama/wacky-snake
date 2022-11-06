@@ -3,6 +3,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <string>
+#include <unordered_map>
 
 namespace OpenGL {
     class IGLObject {
@@ -83,7 +85,7 @@ namespace OpenGL {
             GLuint offset;
             std::vector<VertexAttribute::Entry*> entries;
         public:
-            Builder(GLsizei stride, GLuint divisor = 0);
+			Builder(GLsizei stride, GLuint divisor = 0, GLuint offset = 0);
 
             VertexAttribute::Builder& addInt(GLuint index, GLint size, GLenum type);
             VertexAttribute::Builder& addFloat(GLuint index, GLint size, GLenum type, GLboolean normalized);
@@ -181,12 +183,16 @@ namespace OpenGL {
         void destroyAll();
     };
 
-    class ShaderProgram final : public IGLBinding {
+    class ShaderProgram : public IGLBinding {
+    private:
+        std::unordered_map<std::string, GLuint> bindings;
     public:
-        ShaderProgram(const std::string& vertex, const std::string& fragment);
+        ShaderProgram(const std::string vertex, const std::string fragment);
         ~ShaderProgram();
 
         void destroy() const override;
         void bind0(const GLuint id) const override;
+
+		void bindBuffer(const GLuint target, const BufferObject buffer, const std::string& blockName, const GLintptr offset = -1, const GLsizeiptr size = -1);
     };
 }
