@@ -23,18 +23,8 @@ public:
 	void updateView(glm::vec2 mousePosDelta);
 };
 
-struct SkyboxShaderProgram : public OpenGL::ShaderProgram {
-	GLuint mouseUniform;
-
-	SkyboxShaderProgram();
-};
-
 struct SkyboxRenderer {
 	RenderEngine& renderEngine;
-	
-	SkyboxShaderProgram skyboxShaderProgram;
-	OpenGL::VertexArrayObject skyboxVAO;
-	OpenGL::BufferObject::Immutable skyboxVBO;
 
 	OpenGL::ShaderProgram borderShaderProgram;
 	OpenGL::VertexArrayObject borderVAO;

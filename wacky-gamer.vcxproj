@@ -139,9 +139,6 @@
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\RenderEngine.h" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\shaders\Background.frag.glsl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
