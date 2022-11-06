@@ -25,7 +25,12 @@ public:
 		if (playing) {
 			timeElapsed += dt;
 
-			playing = player.tick(dt, world);
+			// if they didn't lose
+			playing = player.tick(dt, world) == LoseCode::None;
 		}
+	}
+
+	double getScore() {
+		return timeElapsed + player.foodsEaten;
 	}
 };

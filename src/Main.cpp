@@ -59,7 +59,7 @@ int main() {
 
     // game initialization
     Game game;
-    game.placeFood(1000);
+    game.placeFood(10);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

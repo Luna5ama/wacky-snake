@@ -7,6 +7,13 @@
 #include "Object.hpp"
 #include "World.hpp"
 
+enum class LoseCode : unsigned char {
+	None, // didn't lose
+	Shrunk,	//shrunk out of existence
+	Walled, //hit wall
+	Snaked, //hit self
+};
+
 class Snake {
 private:
 	// flag preventing multiple turn segments being created per frame.
@@ -18,6 +25,8 @@ protected:
 	float length;
 
 public:
+	size_t foodsEaten = 0;
+
 	static constexpr float radius = 0.5f;
 	static constexpr float speed = 1.0f; // speed in m/s
 	static constexpr float shrinkage = 0.926118f;
@@ -126,7 +135,7 @@ public:
 	}
 
 	// returns false on game end
-	[[nodiscard]] bool tick(float dt, World& world) {
+	[[nodiscard]] LoseCode tick(float dt, World& world) {
 		turned = false;
 		auto& head = segments[0];
 
@@ -138,12 +147,12 @@ public:
 			glm::abs(target.z) > 128.0f) {
 
 			// snake out of bounds :(
-			return false;
+			return LoseCode::Walled;
 		}
 
 		if (dist(bounding, 2) <= 0.0) {
 			// snake collided with self :(
-			return false;
+			return LoseCode::Snaked;
 		}
 
 		//@TODO deal with large, rapid, and evil dt changes
@@ -155,7 +164,8 @@ public:
 			{
 			case Item::Food:
 				grow();
-				collided->item = Item::None;
+				world.moveObj(*collided, *this);
+				foodsEaten += 1;
 				break;
 			default:
 				break;
@@ -166,11 +176,11 @@ public:
 
 		if (segments.size() < 2) {
 			// shrunk or something :(
-			return false;
+			return LoseCode::Shrunk;
 		}
 
 		head = target;
 		shrinkLen(speed * dt);
-		return true;
+		return LoseCode::None;
 	};
 };
