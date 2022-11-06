@@ -7,8 +7,24 @@
 
 using namespace glm;
 
+template <size_t N> [[nodiscard]]
+constexpr std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
+
+	std::array<vec3, N> out;
+
+	for (int i = 0; i < N; ++i) {
+		vec3 A = mesh[i * 3];
+		vec3 B = mesh[i * 3 + 1];
+		vec3 C = mesh[i * 3 + 2];
+
+		out[i] = glm::normalize(glm::cross(B - A, C - A)));
+	}
+
+	return out;
+}
+
 template <class T> [[nodiscard]]
-constexpr std::vector<vec3> createNormals(const T& mesh) {
+std::vector<vec3> createNormals(const T& mesh) {
 
 	std::vector<vec3> out;
 	out.reserve(mesh.size() / 3);
