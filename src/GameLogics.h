@@ -27,6 +27,9 @@ struct ItemObj : public Object {
 struct World {
 	std::vector<ItemObj> objects;
 
+	World() :
+		objects() {}
+
 	// returns nullptr on failure, ignores None items
 	// type T must have distance function that takes an Object as input
 	template <class T>
@@ -57,6 +60,11 @@ public:
 	// flag preventing multiple turn segments being created per frame.
 	bool turned = false;
 
+	Snake() :
+		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -10.0) }),
+		direction(glm::vec3(0.0, 0.0, 1.0)),
+		length(1.0f) {}
+
 	void setDirection(glm::vec3 dir) {
 		if (dir != direction) {
 			if (!turned) {
@@ -68,7 +76,7 @@ public:
 		}
 	}
 
-	constexpr float dist(Object obj) const {
+	constexpr float dist(Object obj, int offset = 0) const {
 
 		float current = 9999999999999999999.0f;
 
@@ -86,7 +94,7 @@ public:
 		};
 
 		// a single segment snake should not exist
-		for (int i = 1; i < segments.size(); ++i) {
+		for (int i = 1 + offset; i < segments.size(); ++i) {
 			current = glm::min(current, dist(segments[i - 1], segments[i]));
 		}
 
@@ -163,7 +171,7 @@ public:
 			return false;
 		}
 
-		if (collides(bounding)) {
+		if (dist(bounding, 2) <= 0.0) {
 			// snake collided with self :(
 			return false;
 		}
