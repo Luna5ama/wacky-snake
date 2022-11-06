@@ -21,7 +21,7 @@ public:
 	Camera();
 
 	void updateProjection(GameWindow& gameWindow);
-	void updateView(glm::vec2 mousePosDelta);
+	void updateModelView(Game& game, glm::vec2 mousePosDelta);
 };
 
 struct SkyboxRenderer {

@@ -170,7 +170,7 @@ int main() {
 
         // Render goes here
         renderEngine.camera.updateProjection(gameWindow);
-        renderEngine.camera.updateView(mouseDelta);
+        renderEngine.camera.updateModelView(game, mouseDelta);
 		renderEngine.setup(gameWindow, game, dt);
 		renderEngine.skyboxRenderer.render(gameWindow);
 		renderEngine.render(gameWindow, dt);
