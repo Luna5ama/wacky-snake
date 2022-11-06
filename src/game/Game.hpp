@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameLogics.h"
-#include "GLObjects.hpp"
+#include "World.hpp"
+#include "Snake.hpp"
 
 class Game {
 	Snake player;

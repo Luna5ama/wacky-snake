@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "Game.hpp"
+#include "game/Game.hpp"
 
 // Debug message handler
 void GLAPIENTRY messageCallback(GLenum source,
