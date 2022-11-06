@@ -7,3 +7,14 @@
 - Your project must be publically available and under source control (organizers need to be able to view your code repository) -  you can use GitHub, GitLab, Bitbucket, or any other code hosting service
 - Projects can not have been submitted to another event, including other hackathons this weekend.
 - [Code of Conduct](https://drive.google.com/file/d/1RH_TtRu6EOHSbOoiSj2h1Q4jswtVILzE/view)
+
+# Building!
+
+Use a version of Microsoft Visual Studio that is compatable with C++20 and vcpkg
+
+Install the following vcpkgs:
+- glew:x64-windows-static
+- glfw3:x64-windows-static
+- glm:x64-windows-static
+
+Enjoy!
