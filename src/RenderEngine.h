@@ -1,6 +1,8 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include "GLObjects.hpp"
+#include "Main.h"
 
 class RenderEngine;
 
@@ -17,7 +19,7 @@ public:
 
 	Camera();
 
-	void updateProjection(glm::vec2 windowSize);
+	void updateProjection(GameWindow& gameWindow);
 	void updateView(glm::vec2 mousePosDelta);
 };
 
@@ -40,16 +42,16 @@ struct SkyboxRenderer {
 
 	SkyboxRenderer(RenderEngine& renderEngine);
 
-    void render();
+    void render(GameWindow& gameWindow);
 };
 
 class RenderEngine {
 public:
-	OpenGL::BufferObject::Immutable globalUBO;
 	Camera camera;
+	OpenGL::BufferObject::Immutable globalUBO;
 	SkyboxRenderer skyboxRenderer;
 	
 	RenderEngine();
 	
-	void setupGlobalUBO(glm::vec2 windowSize, float tickDelta);
+	void setup(GameWindow& gameWindow, float tickDelta);
 };
