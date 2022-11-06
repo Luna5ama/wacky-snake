@@ -56,9 +56,10 @@ int main() {
     }
 
     double curTime = glfwGetTime();
-    
+
+    // game initialization
     Game game;
-    game.placeFood();
+    game.placeFood(1000);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
