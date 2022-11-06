@@ -65,23 +65,23 @@ constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, fl
 	vec3 vertF(maxX, maxY, maxZ);
 
 	return {
-		vertA, vertB, vertD,
-		vertA, vertD, vertC,
+		vertA, vertD, vertB,
+		vertA, vertC, vertD,
 
-		vertB, vertH, vertF,
-		vertB, vertF, vertD,
+		vertB, vertF, vertH,
+		vertB, vertD, vertF,
 
-		vertC, vertD, vertF,
-		vertC, vertF, vertE,
+		vertC, vertF, vertD,
+		vertC, vertE, vertF,
 
-		vertA, vertH, vertB,
-		vertA, vertG, vertH,
+		vertA, vertB, vertH,
+		vertA, vertH, vertG,
 
-		vertA, vertE, vertG,
-		vertA, vertC, vertE,
+		vertA, vertG, vertE,
+		vertA, vertE, vertC,
 
-		vertG, vertF, vertH,
-		vertG, vertE, vertF
+		vertG, vertH, vertF,
+		vertG, vertF, vertE
 	};
 }
 

@@ -177,12 +177,13 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, gameWindow.windowSize.x, gameWindow.windowSize.y);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         // Render goes here
         renderEngine.camera.updateProjection(gameWindow);
         renderEngine.camera.updateModelView(game, mouseDelta);
 		renderEngine.setup(gameWindow, game, dt);
-		renderEngine.skyboxRenderer.render(gameWindow);
 		renderEngine.render(gameWindow, dt);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

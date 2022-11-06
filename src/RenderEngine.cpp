@@ -34,40 +34,40 @@ SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderE
 		{ -64.0f, -64.0f, -64.0f },
 		{ 64.0f, -64.0f, 64.0f},
 		{ -64.0f, -64.0f, 64.0f },
-		{ -64.0f, -64.0f, -64.0f },
 		{ 64.0f, -64.0f, 64.0f },
+		{ -64.0f, -64.0f, -64.0f },
 		// Up
 		{ 64.0f, 64.0f, -64.0f },
-		{ -64.0f, 64.0f, -64.0f },
 		{ 64.0f, 64.0f, 64.0f },
+		{ -64.0f, 64.0f, -64.0f },
 		{ -64.0f, 64.0f, 64.0f },
 		{ -64.0f, 64.0f, -64.0f },
 		{ 64.0f, 64.0f, 64.0f },
 		// West
 		{ -64.0f, -64.0f, -64.0f },
-		{ -64.0f, -64.0f, 64.0f },
 		{ -64.0f, 64.0f, -64.0f },
+		{ -64.0f, -64.0f, 64.0f },
 		{ -64.0f, 64.0f, 64.0f },
 		{ -64.0f, -64.0f, 64.0f },
 		{ -64.0f, 64.0f, -64.0f },
 		// East
 		{ 64.0f, -64.0f, -64.0f },
 		{ 64.0f, -64.0f, 64.0f },
-		{64.0f, 64.0f, -64.0f },
-		{ 64.0f, 64.0f, 64.0f },
-		{ 64.0f, -64.0f, 64.0f },
 		{ 64.0f, 64.0f, -64.0f },
+		{ 64.0f, 64.0f, 64.0f },
+		{ 64.0f, 64.0f, -64.0f },
+		{ 64.0f, -64.0f, 64.0f },
 		// South
 		{ -64.0f, -64.0f, -64.0f },
 		{ 64.0f, -64.0f, -64.0f },
 		{ -64.0f, 64.0f, -64.0f },
 		{ 64.0f, 64.0f, -64.0f },
-		{ 64.0f, -64.0f, -64.0f },
 		{ -64.0f, 64.0f, -64.0f },
+		{ 64.0f, -64.0f, -64.0f },
 		// North
 		{ -64.0f, -64.0f, 64.0f },
-		{ 64.0f, -64.0f, 64.0f },
 		{ -64.0f, 64.0f, 64.0f },
+		{ 64.0f, -64.0f, 64.0f },
 		{ 64.0f, 64.0f, 64.0f },
 		{ 64.0f, -64.0f, 64.0f },
 		{ -64.0f, 64.0f, 64.0f }
@@ -167,6 +167,7 @@ void RenderEngine::setup(GameWindow& gameWindow, Game& game, float tickDelta) {
 }
 
 void RenderEngine::render(GameWindow& gameWindow, float tickDelta) {
+	this->skyboxRenderer.render(gameWindow);
 	glEnable(GL_DEPTH_TEST);
 	this->genericDrawShaderProgram.bind();
 	this->genericDrawShaderProgram.bindBuffer(GL_UNIFORM_BUFFER, this->globalUBO, "Global");

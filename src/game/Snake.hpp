@@ -43,13 +43,13 @@ public:
 	void setRotation(glm::vec2 rotation) {
 		rotation.x = normalizeAngle(rotation.x);
 		// no change or change is impossible
-		if (rotation.x != normalizeAngle(this->rotation.x + 180.0f)
-			&& (rotation.y == 0.0f || rotation.y != -this->rotation.y)
+		if (rotation != this->rotation
+			&& (rotation.y != 0.0f || this->rotation.y != 0.0f || rotation.x != normalizeAngle(this->rotation.x + 180.0f))
+			&& (rotation.y == 0.0f || this->rotation.y == 0.0f || rotation.y != -this->rotation.y)
 			&& segments.size() > 0) {
 			if (timeSinceTurn * speed <= radius) {
 				queuedRotation = rotation;
-			}
-			else {
+			} else {
 				if (!turned) {
 					segments.insert(segments.begin(), segments[0]);
 					timeSinceTurn = 0.0;
