@@ -119,17 +119,20 @@ void setupUBO(RenderEngine& renderEngine, GameWindow& gameWindow, float tickDelt
 void setupMesh(RenderEngine& renderEngine, Game& game, float tickDelta) {
 	renderEngine.buffer.update();
 	std::vector<ItemObj>& worldObjs = game.world.objects;
-	for (int i = 0; i < worldObjs.size(); i++) {
-		ItemObj& obj = worldObjs[i];
+	for (auto& obj : worldObjs) {
 		switch (obj.item) {
 			case Item::Food:
-				fillFoodMeshInterleaved(renderEngine.buffer, obj.pos, obj.radius, { 0.0f, 1.0f, 0.0f, 1.0f });
+				fillFoodMeshInterleaved(renderEngine.buffer, obj.pos, obj.radius, { 1.0f, 0.0f, 0.0f, 1.0f });
 				break;
 			default:
 				// ADD more
 				break;
 		}
 	}
+
+	fillSnakeMeshInterleaved(game.player.segments, renderEngine.buffer, Snake::radius, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+
 	renderEngine.worldObjVAO.clearAttachments();
 	renderEngine.worldObjVAO.attachVertexBuffer(
 		renderEngine.buffer.buffer,

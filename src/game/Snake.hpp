@@ -18,29 +18,32 @@ class Snake {
 private:
 	// flag preventing multiple turn segments being created per frame.
 	bool turned = false;
+	double timeSinceTurn = 100000.0;
 
 protected:
-	std::vector<glm::vec3> segments;
 	glm::vec3 direction;
 	float length;
 
 public:
+	std::vector<glm::vec3> segments;
 	size_t foodsEaten = 0;
 
 	static constexpr float radius = 0.5f;
 	static constexpr float speed = 1.0f; // speed in m/s
-	static constexpr float shrinkage = 0.926118f;
+	//static constexpr float shrinkage = 0.926118f;
+	static constexpr float shrinkage = 1.0f;
 
 	Snake() :
-		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -10.0) }),
+		segments({ glm::vec3(0.0, -5.0, 0.0), glm::vec3(0.0, -5.0, -10.0) }),
 		direction(glm::vec3(0.0, 0.0, 1.0)),
 		length(10.0f) {}
 
 	void setDirection(glm::vec3 dir) {
 		// no change or change is impossible
-		if (dir != direction && dir != -direction && segments.size() > 0) {
+		if (dir != direction && dir != -direction && timeSinceTurn*speed > radius && segments.size() > 0) {
 			if (!turned) {
 				segments.insert(segments.begin(), segments[0]);
+				timeSinceTurn = 0.0;
 				turned = true;
 			}
 
@@ -64,7 +67,7 @@ public:
 			if (h < 0.0) h = 0.0;
 			if (h > 1.0) h = 1.0;
 
-			return glm::length(pa - ba * h) - radius - obj.radius;
+			return glm::length(pa - ba * h) - obj.radius;
 		};
 
 		// a single segment snake should not exist
@@ -144,6 +147,7 @@ public:
 	// returns a LoseCode other than None on game end
 	[[nodiscard]] 
 	LoseCode tick(float dt, World& world) {
+		timeSinceTurn += dt;
 		turned = false;
 		auto& head = segments[0];
 

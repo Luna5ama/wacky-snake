@@ -28,13 +28,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         switch (key)
         {
         case GLFW_KEY_W:
-            game.player.setDirection(glm::vec3(0.0, 0.0, 1.0));
+            game.player.setDirection(glm::vec3(0.0, 0.0, -1.0));
             break;
         case GLFW_KEY_A:
             game.player.setDirection(glm::vec3(-1.0, 0.0, 0.0));
             break;
         case GLFW_KEY_S:
-            game.player.setDirection(glm::vec3(0.0, 0.0, -1.0));
+            game.player.setDirection(glm::vec3(0.0, 0.0, 1.0));
             break;
         case GLFW_KEY_D:
             game.player.setDirection(glm::vec3(1.0, 0.0, 0.0));
@@ -101,7 +101,7 @@ int main() {
     double lastTickTime = curTime;
 
     // game initialization
-    game.placeFood(10);
+    game.placeFood(1000);
 
     while (!glfwWindowShouldClose(gameWindow.window)) {
         glfwPollEvents();

@@ -87,16 +87,19 @@ constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, fl
 
 [[nodiscard]]
 std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen) {
+	if (points.size() < 2) return {};
+
 	std::vector<vec3> out;
 	out.reserve(points.size() * 36);
 
-	for (int i = 1; i < points.size() - 1; ++i) {
+	for (int i = 1; i < points.size(); ++i) {
 		auto p1 = points[i - 1];
 		auto p2 = points[i];
 
 		vec3 dir = normalize(p2 - p1);
 
-		vec3 endp = p2 - dir * sidelen;
+		//vec3 endp = p2 - dir * sidelen;
+		vec3 endp = p2;
 
 		auto verts = createRectMesh(p1, endp, sidelen);
 		for (auto&& vert : verts) {
@@ -104,72 +107,36 @@ std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen
 		}
 	}
 
-	auto verts = createRectMesh(points.back(), points.back(), sidelen);
-	for (auto&& vert : verts) {
-		out.emplace_back(vert);
-	}
-
 	return out;
 }
 
-void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos, float raidius, vec4 color) {
-	static constexpr float a = 0.52573;
-	static constexpr float b = 0.85065;
+void fillSnakeMeshInterleaved(const std::vector<vec3>& points, PersistentMappedBuffer& buffer, float sidelen, vec4 color) {
+	auto snakeMesh = createSnakeMesh(points, sidelen);
+	auto normals = createNormals(snakeMesh);
 
-	// adapted from https://github.com/anishagartia/Icosahedron_OpenGL
-	static constexpr std::array <vec3, 12> verts = {
-		vec3(-a, 0.0, b), vec3(a, 0.0, b), vec3(-a, 0.0, -b), vec3(a, 0.0, -b),
-		vec3(0.0, b, a), vec3(0.0, b, -a), vec3(0.0, -b, a), vec3(0.0, -b, -a),
-		vec3(b, a, 0.0), vec3(-b, a, 0.0), vec3(b, -a, 0.0), vec3(-b, -a, 0.0)
-	};
+	for (int i = 0; i < snakeMesh.size(); i += 3) {
+		int nIndex = i / 3;
 
-	//unit isocahedron
- 	static constexpr std::array<vec3, 20 * 3> isocahedronMesh = {
-		verts[0], verts[4], verts[1],
-		verts[0], verts[9], verts[4],
-		verts[9], verts[5], verts[4],
-		verts[4], verts[5], verts[8],
-		verts[4], verts[8], verts[1],
-		verts[8], verts[10], verts[1],
-		verts[8], verts[3], verts[10],
-		verts[5], verts[3], verts[8],
-		verts[5], verts[2], verts[3],
-		verts[2], verts[7], verts[3],
-		verts[7], verts[10], verts[3],
-		verts[7], verts[6], verts[10],
-		verts[7], verts[11], verts[6],
-		verts[11], verts[0], verts[6],
-		verts[0], verts[1], verts[6],
-		verts[6], verts[1], verts[10],
-		verts[9], verts[0], verts[11],
-		verts[9], verts[11], verts[2],
-		verts[9], verts[2], verts[5],
-		verts[7], verts[2], verts[11],
-	};
-
-	static auto normals = createNormals(isocahedronMesh);
-
-	for (int i = 0; i < 20; i++) {
-		vec3 transformed = isocahedronMesh[i * 3] * raidius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		auto& curA = snakeMesh[i];
+		memcpy(buffer.pointer + buffer.size, &curA, sizeof(vec3));
 		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
 		buffer.size += sizeof(vec3);
 		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
 		buffer.size += sizeof(vec4);
 
-		transformed = isocahedronMesh[i * 3 + 1] * raidius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		auto& curB = snakeMesh[i + 1];
+		memcpy(buffer.pointer + buffer.size, &curB, sizeof(vec3));
 		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
 		buffer.size += sizeof(vec3);
 		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
 		buffer.size += sizeof(vec4);
 
-		transformed = isocahedronMesh[i * 3 + 2] * raidius + pos;
-		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		auto& curC = snakeMesh[i + 2];
+		memcpy(buffer.pointer + buffer.size, &curC, sizeof(vec3));
 		buffer.size += sizeof(vec3);
-		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		memcpy(buffer.pointer + buffer.size, &normals[nIndex], sizeof(vec3));
 		buffer.size += sizeof(vec3);
 		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
 		buffer.size += sizeof(vec4);
@@ -177,7 +144,7 @@ void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos, float rai
 }
 
 [[nodiscard]]
-constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
+consteval std::array<vec3, 20 * 3> createFoodMesh() {
 	constexpr float a = 0.52573;
 	constexpr float b = 0.85065;
 
@@ -212,6 +179,13 @@ constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
 		verts[7], verts[2], verts[11],
 	};
 
+	return isocahedronMesh;
+}
+
+[[nodiscard]]
+constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
+	constexpr std::array<vec3, 20*3> isocahedronMesh = createFoodMesh();
+
 	std::array<vec3, 20 * 3> out{};
 	for (int i = 0; i < out.size(); ++i) {
 		out[i] = isocahedronMesh[i] * r + pos;
@@ -219,3 +193,36 @@ constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
 
 	return out;
 }
+
+void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos, float radius, vec4 color) {
+	static constexpr auto isocahedronMesh = createFoodMesh();
+
+	static auto normals = createNormals(isocahedronMesh);
+
+	for (int i = 0; i < 20; i++) {
+		vec3 transformed = isocahedronMesh[i * 3] * radius + pos;
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
+		buffer.size += sizeof(vec4);
+
+		transformed = isocahedronMesh[i * 3 + 1] * radius + pos;
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
+		buffer.size += sizeof(vec4);
+
+		transformed = isocahedronMesh[i * 3 + 2] * radius + pos;
+		memcpy(buffer.pointer + buffer.size, &transformed, sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &color, sizeof(vec4));
+		buffer.size += sizeof(vec4);
+	}
+}
+

@@ -32,10 +32,10 @@ public:
 		switch (state)
 		{
 		case State::Waiting:
-			// give 2.5seconds so stuff has a chance to load
+			// give 1 second so stuff has a chance to load
 			timeElapsed += dt;
 			
-			if (timeElapsed >= 2.5) {
+			if (timeElapsed >= 1.0) {
 				state = State::Playing;
 				timeElapsed = 0.0f;
 			}
