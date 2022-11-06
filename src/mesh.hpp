@@ -8,7 +8,7 @@
 using namespace glm;
 
 template <size_t N> [[nodiscard]]
-constexpr std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
+std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
 
 	std::array<vec3, N> out;
 
