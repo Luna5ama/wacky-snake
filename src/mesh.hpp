@@ -7,6 +7,23 @@
 
 using namespace glm;
 
+template <class T> [[nodiscard]]
+constexpr std::vector<vec3> createNormals(const T& mesh) {
+
+	std::vector<vec3> out;
+	out.reserve(mesh.size() / 3);
+
+	for (int i = 0; i < mesh.size() / 3; ++i) {
+		vec3 A = mesh[i * 3];
+		vec3 B = mesh[i * 3 + 1];
+		vec3 C = mesh[i * 3 + 2];
+
+		out.emplace_back(glm::normalize(glm::cross(B - A, C - A)));
+	}
+
+	return out;
+}
+
 //creates an axis-aligned rectangular prism given two points
 [[nodiscard]]
 constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, float sidelen) {
