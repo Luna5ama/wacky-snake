@@ -23,6 +23,7 @@ void GLAPIENTRY messageCallback(GLenum source,
 // game instance
 constexpr int INITIAL_FOODS = 1000;
 Game game{};
+RenderEngine* renderEnginePtr;
 
 bool controlled = false;
 bool wireframe = false;
@@ -35,28 +36,30 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         else if (action == GLFW_RELEASE) {
             controlled = false;
         }
-    }
-    else if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-        switch (key)
-        {
+    } else if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        glm::vec2 cameraRotation = renderEnginePtr->camera.rotation;
+        cameraRotation.x += 180.0f;
+        cameraRotation.y = 0.0f;
+        cameraRotation = glm::round(cameraRotation / 90.0f) * 90.0f;
+        switch (key) {
         case GLFW_KEY_W:
-            game.player.setDirection(glm::vec3(0.0, 0.0, -1.0));
+            game.player.setRotation(cameraRotation + glm::vec2(0.0f, 0.0f));
             break;
         case GLFW_KEY_A:
-            game.player.setDirection(glm::vec3(-1.0, 0.0, 0.0));
+            game.player.setRotation(cameraRotation + glm::vec2(-90.0f, 0.0f));
             break;
         case GLFW_KEY_S:
-            game.player.setDirection(glm::vec3(0.0, 0.0, 1.0));
+            game.player.setRotation(cameraRotation + glm::vec2(180.0f, 0.0f));
             break;
         case GLFW_KEY_D:
-            game.player.setDirection(glm::vec3(1.0, 0.0, 0.0));
+            game.player.setRotation(cameraRotation + glm::vec2(90.0f, 0.0f));
             break;
 
         case GLFW_KEY_SPACE:
-            game.player.setDirection(glm::vec3(0.0, 1.0, 0.0));
+            game.player.setRotation(cameraRotation + glm::vec2(0.0f, 90.0f));
             break;
         case GLFW_KEY_LEFT_SHIFT:
-            game.player.setDirection(glm::vec3(0.0, -1.0, 0.0));
+            game.player.setRotation(cameraRotation + glm::vec2(0.0f, -90.0f));
             break;
             
         case GLFW_KEY_ESCAPE:
@@ -135,6 +138,7 @@ int main() {
 
     // Setup here
 	RenderEngine renderEngine;
+    renderEnginePtr = &renderEngine;
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {

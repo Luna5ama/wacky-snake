@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="src\GLObjects.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\MathUtils.cpp" />
     <ClCompile Include="src\RenderEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +140,7 @@
     <ClInclude Include="src\game\Snake.hpp" />
     <ClInclude Include="src\game\World.hpp" />
     <ClInclude Include="src\GLObjects.hpp" />
+    <ClInclude Include="src\MathUtils.h" />
     <ClInclude Include="src\Mesh.hpp" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\RenderEngine.h" />

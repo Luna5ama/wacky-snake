@@ -32,7 +32,7 @@ struct World {
 	// collider is any object that implements collides(Object) aka. the snake
 	template <class T>
 	void moveObj(Object& obj, const T& collider) {
-		std::uniform_int_distribution<int> dist(-128, 128);
+		std::uniform_int_distribution<int> dist(-64, 64);
 
 		do {
 

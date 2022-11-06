@@ -7,10 +7,10 @@
 #include "Main.h"
 #include <iostream>
 
-Camera::Camera() : matrix(), rotation(135.0f, 45.0f), fov(60.0f) {}
+Camera::Camera() : matrix(), rotation(160.0f, 30.0f), fov(60.0f) {}
 
 void Camera::updateProjection(GameWindow& gameWindow) {
-	this->matrix.projection = glm::perspective(glm::radians(this->fov), (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 1024.0f);
+	this->matrix.projection = glm::perspective(glm::radians(this->fov), (float) gameWindow.windowSize.x / (float) gameWindow.windowSize.y, 0.001f, 512.0f);
 }
 	
 void Camera::updateModelView(Game& game, glm::vec2 mousePosDelta) {
@@ -30,47 +30,47 @@ void Camera::updateModelView(Game& game, glm::vec2 mousePosDelta) {
 SkyboxRenderer::SkyboxRenderer(RenderEngine& renderEngine): renderEngine(renderEngine), borderShaderProgram("resources/shaders/Border.vert.glsl", "resources/shaders/Border.frag.glsl") {	
 	glm::vec3 borderVertices[] = {
 		// Down
-		{ 128.0f, -128.0f, -128.0f },
-		{ -128.0f, -128.0f, -128.0f },
-		{ 128.0f, -128.0f, 128.0f},
-		{ -128.0f, -128.0f, 128.0f },
-		{ -128.0f, -128.0f, -128.0f },
-		{ 128.0f, -128.0f, 128.0f },
+		{ 64.0f, -64.0f, -64.0f },
+		{ -64.0f, -64.0f, -64.0f },
+		{ 64.0f, -64.0f, 64.0f},
+		{ -64.0f, -64.0f, 64.0f },
+		{ -64.0f, -64.0f, -64.0f },
+		{ 64.0f, -64.0f, 64.0f },
 		// Up
-		{ 128.0f, 128.0f, -128.0f },
-		{ -128.0f, 128.0f, -128.0f },
-		{ 128.0f, 128.0f, 128.0f },
-		{ -128.0f, 128.0f, 128.0f },
-		{ -128.0f, 128.0f, -128.0f },
-		{ 128.0f, 128.0f, 128.0f },
+		{ 64.0f, 64.0f, -64.0f },
+		{ -64.0f, 64.0f, -64.0f },
+		{ 64.0f, 64.0f, 64.0f },
+		{ -64.0f, 64.0f, 64.0f },
+		{ -64.0f, 64.0f, -64.0f },
+		{ 64.0f, 64.0f, 64.0f },
 		// West
-		{ -128.0f, -128.0f, -128.0f },
-		{ -128.0f, -128.0f, 128.0f },
-		{ -128.0f, 128.0f, -128.0f },
-		{ -128.0f, 128.0f, 128.0f },
-		{ -128.0f, -128.0f, 128.0f },
-		{ -128.0f, 128.0f, -128.0f },
+		{ -64.0f, -64.0f, -64.0f },
+		{ -64.0f, -64.0f, 64.0f },
+		{ -64.0f, 64.0f, -64.0f },
+		{ -64.0f, 64.0f, 64.0f },
+		{ -64.0f, -64.0f, 64.0f },
+		{ -64.0f, 64.0f, -64.0f },
 		// East
-		{ 128.0f, -128.0f, -128.0f },
-		{ 128.0f, -128.0f, 128.0f },
-		{128.0f, 128.0f, -128.0f },
-		{ 128.0f, 128.0f, 128.0f },
-		{ 128.0f, -128.0f, 128.0f },
-		{ 128.0f, 128.0f, -128.0f },
+		{ 64.0f, -64.0f, -64.0f },
+		{ 64.0f, -64.0f, 64.0f },
+		{64.0f, 64.0f, -64.0f },
+		{ 64.0f, 64.0f, 64.0f },
+		{ 64.0f, -64.0f, 64.0f },
+		{ 64.0f, 64.0f, -64.0f },
 		// South
-		{ -128.0f, -128.0f, -128.0f },
-		{ 128.0f, -128.0f, -128.0f },
-		{ -128.0f, 128.0f, -128.0f },
-		{ 128.0f, 128.0f, -128.0f },
-		{ 128.0f, -128.0f, -128.0f },
-		{ -128.0f, 128.0f, -128.0f },
+		{ -64.0f, -64.0f, -64.0f },
+		{ 64.0f, -64.0f, -64.0f },
+		{ -64.0f, 64.0f, -64.0f },
+		{ 64.0f, 64.0f, -64.0f },
+		{ 64.0f, -64.0f, -64.0f },
+		{ -64.0f, 64.0f, -64.0f },
 		// North
-		{ -128.0f, -128.0f, 128.0f },
-		{ 128.0f, -128.0f, 128.0f },
-		{ -128.0f, 128.0f, 128.0f },
-		{ 128.0f, 128.0f, 128.0f },
-		{ 128.0f, -128.0f, 128.0f },
-		{ -128.0f, 128.0f, 128.0f }
+		{ -64.0f, -64.0f, 64.0f },
+		{ 64.0f, -64.0f, 64.0f },
+		{ -64.0f, 64.0f, 64.0f },
+		{ 64.0f, 64.0f, 64.0f },
+		{ 64.0f, -64.0f, 64.0f },
+		{ -64.0f, 64.0f, 64.0f }
 	};
 	this->borderVBO.allocate(&borderVertices, sizeof(borderVertices), 0);
 	this->borderVAO.attachVertexBuffer(

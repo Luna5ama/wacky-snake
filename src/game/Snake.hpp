@@ -4,6 +4,7 @@
 #include <numbers>
 #include <glm/glm.hpp>
 
+#include "../MathUtils.h"
 #include "Object.hpp"
 #include "World.hpp"
 
@@ -19,10 +20,10 @@ private:
 	// flag preventing multiple turn segments being created per frame.
 	bool turned = false;
 	double timeSinceTurn = 100000.0;
-	glm::vec3 queuedDir = glm::vec3(0.0f);
+	glm::vec2 queuedRotation = glm::vec2(0.0f);
 
 protected:
-	glm::vec3 direction;
+	glm::vec2 rotation;
 	float length;
 
 public:
@@ -36,15 +37,17 @@ public:
 
 	Snake() :
 		segments({ glm::vec3(0.0, -5.0, 0.0), glm::vec3(0.0, -5.0, -10.0) }),
-		direction(glm::vec3(0.0, 0.0, 1.0)),
+		rotation(glm::vec3(0.0, 0.0, 1.0)),
 		length(10.0f) {}
 
-	void setDirection(glm::vec3 dir) {
-
+	void setRotation(glm::vec2 rotation) {
+		rotation.x = normalizeAngle(rotation.x);
 		// no change or change is impossible
-		if (dir != direction && dir != -direction && segments.size() > 0) {
+		if (rotation.x != normalizeAngle(this->rotation.x + 180.0f)
+			&& (rotation.y == 0.0f || rotation.y != -this->rotation.y)
+			&& segments.size() > 0) {
 			if (timeSinceTurn * speed <= radius) {
-				queuedDir = dir;
+				queuedRotation = rotation;
 			}
 			else {
 				if (!turned) {
@@ -53,7 +56,7 @@ public:
 					turned = true;
 				}
 
-				direction = dir;
+				this->rotation = rotation;
 			}
 		}
 	}
@@ -154,22 +157,24 @@ public:
 	// returns a LoseCode other than None on game end
 	[[nodiscard]] 
 	LoseCode tick(float dt, World& world) {
-		
-		if (queuedDir != glm::vec3(0.0) && timeSinceTurn * speed > radius) {
-			setDirection(queuedDir);
-			queuedDir = glm::vec3(0.0);
+		if (queuedRotation != glm::vec2(0.0) && timeSinceTurn * speed > radius) {
+			setRotation(queuedRotation);
+			queuedRotation = glm::vec2(0.0);
 		}
 		timeSinceTurn += dt;
 
 		turned = false;
 		auto& head = segments[0];
 
-		glm::vec3 target = head + speed * direction * dt;
+		glm::vec2 sin = glm::sin(glm::radians(this->rotation));
+		glm::vec2 cos = glm::cos(glm::radians(this->rotation));
+		glm::vec3 dir = glm::vec3(-sin.x * cos.y, sin.y, cos.x * cos.y);
+		glm::vec3 target = head + speed * dir * dt;
 		Object bounding{ target, radius };
 
-		if (glm::abs(target.x) > 128.0f ||
-			glm::abs(target.y) > 128.0f ||
-			glm::abs(target.z) > 128.0f) {
+		if (glm::abs(target.x) > 64.0f ||
+			glm::abs(target.y) > 64.0f ||
+			glm::abs(target.z) > 64.0f) {
 
 			// snake out of bounds :(
 			return LoseCode::Walled;
