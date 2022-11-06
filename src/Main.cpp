@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "Game.hpp"
+
 // Debug message handler
 void GLAPIENTRY messageCallback(GLenum source,
     GLenum type,
@@ -53,9 +55,18 @@ int main() {
         std::cerr << "Pre render OpenGL error: " << err << std::endl;
     }
 
+    double curTime = glfwGetTime();
+    
+    Game game;
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         // Process inputs here
+
+        double time = glfwGetTime();
+        double dt = time - curTime;
+        game.tick(dt);
+
 
         glfwGetWindowSize(window, &windowSize.x, &windowSize.y);
 
