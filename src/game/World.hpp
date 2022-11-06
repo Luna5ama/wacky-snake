@@ -18,7 +18,7 @@ struct World {
 
 	// returns nullptr on failure, ignores None items
 	// type T must have distance function that takes an Object as input
-	template <class T>
+	template <class T> [[nodiscard]]
 	ItemObj* checkCollision(const T& obj, Object* filter = nullptr) {
 		for (auto& object : objects) {
 			if (object.item == Item::None || &object == filter) continue;

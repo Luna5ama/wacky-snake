@@ -3,14 +3,20 @@
 #include "World.hpp"
 #include "Snake.hpp"
 
+enum class State {
+	Waiting,
+	Playing,
+	Overing,
+};
+
 class Game {
+public:
 	Snake player;
 	World world;
 	long double timeElapsed = 0.0;
 
-	bool playing = true;
+	State state = State::Waiting;
 
-public:
 
 	Game() :
 		player(), world() {}
@@ -22,11 +28,32 @@ public:
 	}
 
 	void tick(double dt) {
-		if (playing) {
-			timeElapsed += dt;
 
+		switch (state)
+		{
+		case State::Waiting:
+			// give 2.5seconds so stuff has a chance to load
+			timeElapsed += dt;
+			
+			if (timeElapsed >= 2.5) {
+				state = State::Playing;
+				timeElapsed = 0.0f;
+			}
+
+			break;
+
+		case State::Playing:
+			timeElapsed += dt;
 			// if they didn't lose
-			playing = player.tick(dt, world) == LoseCode::None;
+			if (player.tick(dt, world) != LoseCode::None)
+				state = State::Overing;
+			break;
+
+		case State::Overing:
+			// game over :(
+			break;
+		default:
+			break;
 		}
 	}
 

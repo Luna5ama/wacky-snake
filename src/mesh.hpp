@@ -8,6 +8,7 @@
 using namespace glm;
 
 //creates an axis-aligned rectangular prism given two points
+[[nodiscard]]
 constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, float sidelen) {
 	float halflen = sidelen * 0.5f;
 
@@ -50,6 +51,7 @@ constexpr std::array<vec3, 36> createRectMesh(const vec3& p1, const vec3& p2, fl
 	};
 }
 
+[[nodiscard]]
 std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen) {
 	std::vector<vec3> out;
 	out.reserve(points.size() * 36);
@@ -76,6 +78,7 @@ std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen
 	return out;
 }
 
+[[nodiscard]]
 constexpr std::array<vec3, 20 * 3> createFoodMesh(vec3 pos, float r) {
 	constexpr float a = 0.52573;
 	constexpr float b = 0.85065;

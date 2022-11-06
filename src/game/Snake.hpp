@@ -37,7 +37,8 @@ public:
 		length(10.0f) {}
 
 	void setDirection(glm::vec3 dir) {
-		if (dir != direction) {
+		// no change or change is impossible
+		if (dir != direction && dir != -direction && segments.size() > 0) {
 			if (!turned) {
 				segments.insert(segments.begin(), segments[0]);
 				turned = true;
@@ -47,6 +48,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	constexpr float dist(Object obj, int offset = 0) const {
 
 		// really big number
@@ -74,6 +76,7 @@ public:
 	}
 
 	// this isn't accurate to the model at all!
+	[[nodiscard]]
 	constexpr bool collides(Object obj) const {
 
 		// ignore the lack of short curcuit eval
@@ -101,7 +104,11 @@ public:
 			}
 		}
 
-		if (len > 0.0f) [[unlikely]] segments = {};
+		if (len > 0.0f) [[unlikely]] {
+			segments = {};
+			length = 0.0f;
+		}
+		
 	}
 
 	// shinks snake based on delta time
@@ -134,8 +141,9 @@ public:
 		back += ndir; // ignore that this can be abused to have the tail go out of bounds
 	}
 
-	// returns false on game end
-	[[nodiscard]] LoseCode tick(float dt, World& world) {
+	// returns a LoseCode other than None on game end
+	[[nodiscard]] 
+	LoseCode tick(float dt, World& world) {
 		turned = false;
 		auto& head = segments[0];
 

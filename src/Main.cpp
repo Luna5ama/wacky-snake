@@ -18,6 +18,38 @@ void GLAPIENTRY messageCallback(GLenum source,
         type, severity, message);
 }
 
+// game instance
+Game game{};
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        switch (key)
+        {
+        case GLFW_KEY_W:
+            game.player.setDirection(glm::vec3(0.0, 0.0, 1.0));
+            break;
+        case GLFW_KEY_A:
+            game.player.setDirection(glm::vec3(-1.0, 0.0, 0.0));
+            break;
+        case GLFW_KEY_S:
+            game.player.setDirection(glm::vec3(0.0, 0.0, -1.0));
+            break;
+        case GLFW_KEY_D:
+            game.player.setDirection(glm::vec3(1.0, 0.0, 0.0));
+            break;
+
+        case GLFW_KEY_SPACE:
+            game.player.setDirection(glm::vec3(0.0, 1.0, 0.0));
+            break;
+        case GLFW_KEY_LEFT_SHIFT:
+            game.player.setDirection(glm::vec3(0.0, -1.0, 0.0));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 int main() {
     std::string title = "3D Snake";
 
@@ -40,7 +72,7 @@ int main() {
 
     // Mouse/Keyboard callbacks
     //glfwSetMouseButtonCallback(window, mouseButtonCallback);
-    //glfwSetKeyCallback(window, keyCallback);
+    glfwSetKeyCallback(window, keyCallback);
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, 0);
@@ -58,7 +90,6 @@ int main() {
     double curTime = glfwGetTime();
 
     // game initialization
-    Game game;
     game.placeFood(10);
 
     while (!glfwWindowShouldClose(window)) {
@@ -67,6 +98,7 @@ int main() {
 
         double time = glfwGetTime();
         double dt = time - curTime;
+        curTime = time;
         game.tick(dt);
 
 

@@ -6,6 +6,7 @@ struct Object {
 	glm::vec3 pos;
 	float radius;
 
+	[[nodiscard]]
 	float dist(Object other) const {
 		return glm::distance(pos, other.pos) - radius - other.radius;
 	}
