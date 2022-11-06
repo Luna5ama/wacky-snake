@@ -4,22 +4,23 @@
 #include <numbers>
 #include <glm/glm.hpp>
 
-
 #include "Object.hpp"
+#include "World.hpp"
 
 class Snake {
-public:
+private:
+	// flag preventing multiple turn segments being created per frame.
+	bool turned = false;
 
-	static constexpr float radius = 0.5f;
-	static constexpr float speed = 1.0f; // speed in m/s
-	static constexpr float shrinkage = 0.926118f;
-
+protected:
 	std::vector<glm::vec3> segments;
 	glm::vec3 direction;
 	float length;
 
-	// flag preventing multiple turn segments being created per frame.
-	bool turned = false;
+public:
+	static constexpr float radius = 0.5f;
+	static constexpr float speed = 1.0f; // speed in m/s
+	static constexpr float shrinkage = 0.926118f;
 
 	Snake() :
 		segments({ glm::vec3(0.0), glm::vec3(0.0, 0.0, -10.0) }),
@@ -39,6 +40,7 @@ public:
 
 	constexpr float dist(Object obj, int offset = 0) const {
 
+		// really big number
 		float current = 9999999999999999999.0f;
 
 		// https://iquilezles.org/articles/distfunctions/
@@ -69,6 +71,7 @@ public:
 		return dist(obj) <= 0.0;
 	}
 
+	// shrinks snake by len meters
 	void shrinkLen(float len) {
 		while (len > 0.0f && segments.size() > 1) {
 			auto& cur = segments.back();
@@ -92,6 +95,7 @@ public:
 		if (len > 0.0f) [[unlikely]] segments = {};
 	}
 
+	// shinks snake based on delta time
 	void shrink(float dt) {
 		using namespace std::numbers;
 
@@ -110,6 +114,7 @@ public:
 		}
 	}
 
+	// grows the snake by 1 meter via tail
 	void grow() {
 		length += 1;
 

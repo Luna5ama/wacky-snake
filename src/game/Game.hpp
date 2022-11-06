@@ -15,6 +15,12 @@ public:
 	Game() :
 		player(), world() {}
 
+	void placeFood(int n = 1) {
+		for (int i = 0; i < n; ++i) {
+			world.placeFood(player);
+		}
+	}
+
 	void tick(double dt) {
 		if (playing) {
 			timeElapsed += dt;

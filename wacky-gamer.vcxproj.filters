@@ -23,9 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GameLogics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GLObjects.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

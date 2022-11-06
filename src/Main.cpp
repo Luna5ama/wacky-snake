@@ -58,6 +58,7 @@ int main() {
     double curTime = glfwGetTime();
     
     Game game;
+    game.placeFood();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

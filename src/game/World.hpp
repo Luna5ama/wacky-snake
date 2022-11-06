@@ -29,6 +29,7 @@ struct World {
 		return nullptr;
 	}
 
+	// collider is any object that implements collides(Object) aka. the snake
 	template <class T>
 	void moveObj(Object obj, const T& collider) {
 		std::uniform_int_distribution<int> dist(-128, 128);
@@ -42,8 +43,6 @@ struct World {
 
 	template <class T>
 	void placeFood(const T& collider) {
-		std::uniform_int_distribution<int> dist(-128, 128);
-
 		ItemObj food{ glm::vec3(0.0), 0.5, Item::Food };
 
 		moveObj(food, collider);
@@ -51,4 +50,3 @@ struct World {
 		objects.emplace_back(std::move(food));
 	}
 };
-
