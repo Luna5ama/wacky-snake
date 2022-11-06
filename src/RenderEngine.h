@@ -40,11 +40,13 @@ private:
 	uint32_t frame;
 public:
 	OpenGL::BufferObject::Immutable buffer;
-	void* originPtr;
-	void* ptr;
+	char8_t* originPtr;
+	char8_t* pointer;
+	size_t size;
 
 	PersistentMappedBuffer(GLsizeiptr size);
 	void update();
+	void finish();
 };
 
 class RenderEngine {

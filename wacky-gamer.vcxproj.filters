@@ -29,7 +29,7 @@
     <ClInclude Include="src\GLObjects.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mesh.hpp">
+    <ClInclude Include="src\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\Game.hpp">
@@ -52,8 +52,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\shaders\Background.vert.glsl" />
-    <EmbeddedResource Include="resources\shaders\Border.frag.glsl" />
-    <EmbeddedResource Include="resources\shaders\Border.vert.glsl" />
+    <None Include="resources\shaders\Border.frag.glsl" />
+    <None Include="resources\shaders\Border.vert.glsl" />
   </ItemGroup>
 </Project>

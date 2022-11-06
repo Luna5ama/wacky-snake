@@ -4,11 +4,12 @@
 #include <array>
 
 #include <glm/glm.hpp>
+#include "RenderEngine.h"
 
 using namespace glm;
 
 template <size_t N> [[nodiscard]]
-std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
+constexpr std::array<vec3, N> createNormals(const std::array<vec3, N*3>& mesh) {
 
 	std::array<vec3, N> out;
 
@@ -109,6 +110,62 @@ std::vector<vec3> createSnakeMesh(const std::vector<vec3>& points, float sidelen
 	}
 
 	return out;
+}
+
+constexpr void fillFoodMeshInterleaved(PersistentMappedBuffer& buffer, vec3 pos, float raidius) {
+	constexpr float a = 0.52573;
+	constexpr float b = 0.85065;
+
+	// adapted from https://github.com/anishagartia/Icosahedron_OpenGL
+	constexpr std::array < vec3, 12> verts = {
+		vec3(-a, 0.0, b), vec3(a, 0.0, b), vec3(-a, 0.0, -b), vec3(a, 0.0, -b),
+		vec3(0.0, b, a), vec3(0.0, b, -a), vec3(0.0, -b, a), vec3(0.0, -b, -a),
+		vec3(b, a, 0.0), vec3(-b, a, 0.0), vec3(b, -a, 0.0), vec3(-b, -a, 0.0)
+	};
+
+	//unit isocahedron
+	constexpr std::array<vec3, 20 * 3> isocahedronMesh = {
+		verts[0], verts[4], verts[1],
+		verts[0], verts[9], verts[4],
+		verts[9], verts[5], verts[4],
+		verts[4], verts[5], verts[8],
+		verts[4], verts[8], verts[1],
+		verts[8], verts[10], verts[1],
+		verts[8], verts[3], verts[10],
+		verts[5], verts[3], verts[8],
+		verts[5], verts[2], verts[3],
+		verts[2], verts[7], verts[3],
+		verts[7], verts[10], verts[3],
+		verts[7], verts[6], verts[10],
+		verts[7], verts[11], verts[6],
+		verts[11], verts[0], verts[6],
+		verts[0], verts[1], verts[6],
+		verts[6], verts[1], verts[10],
+		verts[9], verts[0], verts[11],
+		verts[9], verts[11], verts[2],
+		verts[9], verts[2], verts[5],
+		verts[7], verts[2], verts[11],
+	};
+
+	constexpr auto normals = createNormals<20>(isocahedronMesh);
+
+
+	for (int i = 0; i < 20; i++) {
+		memcpy(buffer.pointer + buffer.size, &isocahedronMesh[i * 3], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		
+		memcpy(buffer.pointer + buffer.size, &isocahedronMesh[i * 3 + 1], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		
+		memcpy(buffer.pointer + buffer.size, &isocahedronMesh[i * 3 + 2], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+		memcpy(buffer.pointer + buffer.size, &normals[i], sizeof(vec3));
+		buffer.size += sizeof(vec3);
+	}
 }
 
 [[nodiscard]]
