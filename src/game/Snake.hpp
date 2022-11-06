@@ -19,6 +19,7 @@ private:
 	// flag preventing multiple turn segments being created per frame.
 	bool turned = false;
 	double timeSinceTurn = 100000.0;
+	glm::vec3 queuedDir = glm::vec3(0.0f);
 
 protected:
 	glm::vec3 direction;
@@ -39,15 +40,21 @@ public:
 		length(10.0f) {}
 
 	void setDirection(glm::vec3 dir) {
-		// no change or change is impossible
-		if (dir != direction && dir != -direction && timeSinceTurn*speed > radius && segments.size() > 0) {
-			if (!turned) {
-				segments.insert(segments.begin(), segments[0]);
-				timeSinceTurn = 0.0;
-				turned = true;
-			}
 
-			direction = dir;
+		// no change or change is impossible
+		if (dir != direction && dir != -direction && segments.size() > 0) {
+			if (timeSinceTurn * speed <= radius) {
+				queuedDir = dir;
+			}
+			else {
+				if (!turned) {
+					segments.insert(segments.begin(), segments[0]);
+					timeSinceTurn = 0.0;
+					turned = true;
+				}
+
+				direction = dir;
+			}
 		}
 	}
 
@@ -147,7 +154,13 @@ public:
 	// returns a LoseCode other than None on game end
 	[[nodiscard]] 
 	LoseCode tick(float dt, World& world) {
+		
+		if (queuedDir != glm::vec3(0.0) && timeSinceTurn * speed > radius) {
+			setDirection(queuedDir);
+			queuedDir = glm::vec3(0.0);
+		}
 		timeSinceTurn += dt;
+
 		turned = false;
 		auto& head = segments[0];
 
