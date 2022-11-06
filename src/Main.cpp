@@ -89,6 +89,12 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             if (controlled) {
                 game.state = State::Overing;
             }
+            break;
+        case GLFW_KEY_C: // force continue
+            if (controlled) {
+                game.state = State::Playing;
+            }
+            break;
         default:
             break;
         }
