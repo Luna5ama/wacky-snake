@@ -115,6 +115,8 @@ int main() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	GameWindow gameWindow{ {-1, -1}, {1280, 720}, nullptr };
 	gameWindow.window = glfwCreateWindow(gameWindow.windowSize.x, gameWindow.windowSize.y, title.c_str(), NULL, NULL);
@@ -124,7 +126,6 @@ int main() {
 
 	// Double buffered V-Sync
 	glfwSwapInterval(1);
-	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwSetInputMode(gameWindow.window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	glfwSetInputMode(gameWindow.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwPollEvents();
